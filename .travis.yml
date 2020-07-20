@@ -1,7 +1,7 @@
 language: csharp
 solution: MC-33/MC-33.sln
 install:
-  - nuget restore solution-name.sln
+  - nuget restore MC-33/MC-33.sln
   - nuget install NUnit.Console -Version 3.9.0 -OutputDirectory testrunner
 script:
   - msbuild /p:Configuration=Release MC-33/MC-33.sln
