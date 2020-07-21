@@ -45,15 +45,15 @@ namespace MC_33
 
         public int SizeX
         {
-            get => data.GetLength(0);
+            get => data.GetLength(0) - 1;
         }
         public int SizeY
         {
-            get => data.GetLength(1);
+            get => data.GetLength(1) - 1;
         }
         public int SizeZ
         {
-            get => data.GetLength(2);
+            get => data.GetLength(2) - 1;
         }
 
         public Surface GenerateSurface()

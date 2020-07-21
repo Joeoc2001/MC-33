@@ -303,16 +303,16 @@ namespace MC_33
 				case 3://********************************************
 					if ((c & 0x0080) != 0) m ^= 0x80;
 					if (((m != 0 ? i : i ^ 0xFF) & face_test1((c & 0x7F) >> 1, v)) != 0)
-						pcase = LookUpTable.Case_3_2[4 * (c & 0x7F)];
+						pcase = LookUpTable.Case_3_2[(c & 0x7F)];
 					else
-						pcase = LookUpTable.Case_3_1[2 * (c & 0x7F)];
+						pcase = LookUpTable.Case_3_1[(c & 0x7F)];
 					break;
 				case 4://********************************************
 					if ((c & 0x0080) != 0) m ^= 0x80;
 					if (interior_test((c & 0x7F), 0, v) != 0)
-						pcase = LookUpTable.Case_4_2[6 * (c & 0x7F)];
+						pcase = LookUpTable.Case_4_2[(c & 0x7F)];
 					else
-						pcase = LookUpTable.Case_4_1[2 * (c & 0x7F)];
+						pcase = LookUpTable.Case_4_1[(c & 0x7F)];
 					break;
 				case 5://********************************************
 					if ((c & 0x0080) != 0) m ^= 0x80;
@@ -321,36 +321,36 @@ namespace MC_33
 				case 6://********************************************
 					if ((c & 0x0080) != 0) m ^= 0x80;
 					if (((m != 0 ? i : i ^ 0xFF) & face_test1((c & 0x7F) % 6, v)) != 0)
-						pcase = LookUpTable.Case_6_2[5 * (c & 0x7F)];
+						pcase = LookUpTable.Case_6_2[(c & 0x7F)];
 					else if (interior_test((c & 0x7F) / 6, 0, v) != 0)
-						pcase = LookUpTable.Case_6_1_2[7 * (c & 0x7F)];
+						pcase = LookUpTable.Case_6_1_2[(c & 0x7F)];
 					else
-						pcase = LookUpTable.Case_6_1_1[3 * (c & 0x7F)];
+						pcase = LookUpTable.Case_6_1_1[(c & 0x7F)];
 					break;
 				case 7://********************************************
 					if ((c & 0x0080) != 0) m ^= 0x80;
 					switch (face_tests(f, i, (m != 0 ? 1 : -1), v))
 					{
 						case -3:
-							pcase = LookUpTable.Case_7_1[3 * (c & 0x7F)];
+							pcase = LookUpTable.Case_7_1[(c & 0x7F)];
 							break;
 						case -1:
 							if (f[4] + f[5] == 1)
-								pcase = LookUpTable.Case_7_2_1[5 * (c & 0x7F)];
+								pcase = LookUpTable.Case_7_2_1[(c & 0x7F)];
 							else
-								pcase = (f[(33825 >> ((c & 0x7F) << 1)) & 3] == 1 ? LookUpTable.Case_7_2_3 : LookUpTable.Case_7_2_2)[5 * (c & 0x7F)];
+								pcase = (f[(33825 >> ((c & 0x7F) << 1)) & 3] == 1 ? LookUpTable.Case_7_2_3 : LookUpTable.Case_7_2_2)[(c & 0x7F)];
 							break;
 						case 1:
 							if (f[4] + f[5] == -1)
-								pcase = LookUpTable.Case_7_3_3[9 * (c & 0x7F)];
+								pcase = LookUpTable.Case_7_3_3[(c & 0x7F)];
 							else
-								pcase = (f[(33825 >> ((c & 0x7F) << 1)) & 3] == 1 ? LookUpTable.Case_7_3_2 : LookUpTable.Case_7_3_1)[9 * (c & 0x7F)];
+								pcase = (f[(33825 >> ((c & 0x7F) << 1)) & 3] == 1 ? LookUpTable.Case_7_3_2 : LookUpTable.Case_7_3_1)[(c & 0x7F)];
 							break;
 						case 3:
 							if (interior_test((c & 0x7F) >> 1, 0, v) != 0)
-								pcase = LookUpTable.Case_7_4_2[9 * (c & 0x7F)];
+								pcase = LookUpTable.Case_7_4_2[(c & 0x7F)];
 							else
-								pcase = LookUpTable.Case_7_4_1[5 * (c & 0x7F)];
+								pcase = LookUpTable.Case_7_4_1[(c & 0x7F)];
 							break;
 					}
 					break;
@@ -365,18 +365,18 @@ namespace MC_33
 					{
 						case -2:
 							if ((c & 0x7F) != 0 ? interior_test(0, 0, v) != 0 || interior_test((c & 0x01) == 0 ? 3 : 1, 0, v) != 0 : interior_test(0, 0, v) != 0)
-								pcase = LookUpTable.Case_10_1_2_1[8 * (c & 0x7F)];
+								pcase = LookUpTable.Case_10_1_2_1[(c & 0x7F)];
 							else
-								pcase = LookUpTable.Case_10_1_1_1[4 * (c & 0x7F)];
+								pcase = LookUpTable.Case_10_1_1_1[(c & 0x7F)];
 							break;
 						case 2:
 							if ((c & 0x7F) != 0 ? interior_test(2, 0, v) != 0 || interior_test((c & 0x01) != 0 ? 3 : 1, 0, v) != 0 : interior_test(1, 0, v) != 0)
-								pcase = LookUpTable.Case_10_1_2_2[8 * (c & 0x7F)];
+								pcase = LookUpTable.Case_10_1_2_2[(c & 0x7F)];
 							else
-								pcase = LookUpTable.Case_10_1_1_2[4 * (c & 0x7F)];
+								pcase = LookUpTable.Case_10_1_1_2[(c & 0x7F)];
 							break;
 						case 0:
-							pcase = (f[4 >> ((c & 0x7F) << 1)] == 1 ? LookUpTable.Case_10_2_2 : LookUpTable.Case_10_2_1)[8 * (c & 0x7F)];
+							pcase = (f[4 >> ((c & 0x7F) << 1)] == 1 ? LookUpTable.Case_10_2_2 : LookUpTable.Case_10_2_1)[(c & 0x7F)];
 							break;
 					}
 					break;
@@ -388,18 +388,18 @@ namespace MC_33
 					{
 						case -2:
 							if (interior_test((int)LookUpTable._12_test_index[0, c & 0x7F], 0, v) != 0)
-								pcase = LookUpTable.Case_12_1_2_1[8 * (c & 0x7F)];
+								pcase = LookUpTable.Case_12_1_2_1[(c & 0x7F)];
 							else
-								pcase = LookUpTable.Case_12_1_1_1[4 * (c & 0x7F)];
+								pcase = LookUpTable.Case_12_1_1_1[(c & 0x7F)];
 							break;
 						case 2:
 							if (interior_test((int)LookUpTable._12_test_index[1, c & 0x7F], 0, v) != 0)
-								pcase = LookUpTable.Case_12_1_2_2[8 * (c & 0x7F)];
+								pcase = LookUpTable.Case_12_1_2_2[(c & 0x7F)];
 							else
-								pcase = LookUpTable.Case_12_1_1_2[4 * (c & 0x7F)];
+								pcase = LookUpTable.Case_12_1_1_2[(c & 0x7F)];
 							break;
 						case 0:
-							pcase = (f[(int)LookUpTable._12_test_index[2, c & 0x7F]] == 1 ? LookUpTable.Case_12_2_2 : LookUpTable.Case_12_2_1)[8 * (c & 0x7F)];
+							pcase = (f[(int)LookUpTable._12_test_index[2, c & 0x7F]] == 1 ? LookUpTable.Case_12_2_2 : LookUpTable.Case_12_2_1)[(c & 0x7F)];
 							break;
 					}
 					break;
@@ -408,33 +408,33 @@ namespace MC_33
 					switch (Math.Abs(c))
 					{
 						case 6:
-							pcase = LookUpTable.Case_13_1[4 * (c > 0 ? 1 : 0)];
+							pcase = LookUpTable.Case_13_1[(c > 0 ? 1 : 0)];
 							break;
 						case 4:
 							c >>= 2;
 							i = 0;
 							while (f[i] != -c)
 								++i;
-							pcase = LookUpTable.Case_13_2[6 * (3 * c + 3 + i)];
+							pcase = LookUpTable.Case_13_2[(3 * c + 3 + i)];
 							i = 1;
 							break;
 						case 2:
 							c = (((((((ToInt(f[0] < 0) << 1) | ToInt(f[1] < 0)) << 1) | ToInt(f[2] < 0)) << 1) |
 									ToInt(f[3] < 0)) << 1) | ToInt(f[4] < 0);
-							pcase = LookUpTable.Case_13_3[10 * (25 - c + ((ToInt(c > 10) + ToInt(c > 20)) << 1))];
+							pcase = LookUpTable.Case_13_3[(25 - c + ((ToInt(c > 10) + ToInt(c > 20)) << 1))];
 							break;
 						case 0:
 							c = (ToInt(f[1] < 0) << 1) | ToInt(f[5] < 0);
 							if (f[0] * f[1] * f[5] == 1)
-								pcase = LookUpTable.Case_13_4[12 * c];
+								pcase = LookUpTable.Case_13_4[c];
 							else
 							{
 								i = interior_test(c, 1, v);
 								if (i != 0)
-									pcase = LookUpTable.Case_13_5_2[10 * (c | ((i & 1) << 2))];
+									pcase = LookUpTable.Case_13_5_2[(c | ((i & 1) << 2))];
 								else
 								{
-									pcase = LookUpTable.Case_13_5_1[6 * c];
+									pcase = LookUpTable.Case_13_5_1[c];
 									i = 1;
 								}
 							}
@@ -445,11 +445,13 @@ namespace MC_33
 					pcase = LookUpTable.Case_14[(c & 0x7F)];
 					break;
 			}
-			foreach (ushort j in pcase)
-			{ 
+			foreach (ushort caseItem in pcase)
+			{
+				ushort j = caseItem;
 				for (k = 0; k < 3; ++k)
 				{
 					c = j & 0x0F;
+					j >>= 4;
 					if (p[c] < 0)
 					{
 						switch (c)//the vertices r[3] and normals n[3] are calculated here
@@ -931,11 +933,11 @@ namespace MC_33
 			int[,] _Ox = new int[ny + 1, nx];
 			int[,] _Nx = new int[ny + 1, nx];
 			Surface surface = new Surface();
-			for (z = 0; z < nz - 1; z++)
+			for (z = 0; z < nz; z++)
 			{
 				//D[][] F0 = *F;
 				//D[][] F1 = *(++F);
-				for (y = 0; y < ny - 1; y++)
+				for (y = 0; y < ny; y++)
 				{
 					//D[] V00 = *F0;
 					//D[] V01 = *(++F0);
@@ -946,13 +948,13 @@ namespace MC_33
 					//v2[2] = iso - *V11;
 					//v2[3] = iso - *V10;
 					vs[0] = iso - grid[z, y, 0];
-					vs[1] = iso - grid[z, y, 0];
-					vs[2] = iso - grid[z, y, 0];
-					vs[3] = iso - grid[z, y, 0];
+					vs[1] = iso - grid[z, y + 1, 0];
+					vs[2] = iso - grid[z + 1, y + 1, 0];
+					vs[3] = iso - grid[z + 1, y, 0];
 					//the eight least significant bits of i correspond to vertex indices. (x...x01234567)
 					//If the bit is 1 then the vertex value is greater than zero.
 					i = (((((SignBit(vs[0]) << 1) | SignBit(vs[1])) << 1) | SignBit(vs[2])) << 1) | SignBit(vs[3]);
-					for (x = 1; x < nx; x++)
+					for (x = 0; x < nx; x++)
 					{
 						vs[4] = vs[0];
 						vs[5] = vs[1];
@@ -963,10 +965,10 @@ namespace MC_33
 						//v2[1] = iso - *(++V01);
 						//v2[2] = iso - *(++V11);
 						//v2[3] = iso - *(++V10);
-						vs[0] = iso - grid[z, y, x];
-						vs[1] = iso - grid[z, y + 1, x];
-						vs[2] = iso - grid[z + 1, y + 1, x];
-						vs[3] = iso - grid[z + 1, y, x];
+						vs[0] = iso - grid[z, y, x + 1];
+						vs[1] = iso - grid[z, y + 1, x + 1];
+						vs[2] = iso - grid[z + 1, y + 1, x + 1];
+						vs[3] = iso - grid[z + 1, y, x + 1];
 						i = ((((((((i & 0x0F) << 1) | SignBit(vs[0])) << 1) | SignBit(vs[1])) << 1) | SignBit(vs[2])) << 1) | SignBit(vs[3]);
 						if (i != 0 && i != 0xFF)//i is different from 0 and 0xFF
 						{
