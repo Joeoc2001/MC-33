@@ -37,13 +37,11 @@ namespace MC_33_Tests
             Surface s = grid.GenerateSurface(iso);
             int[] triangles = s.GetTriangles();
             Vector3[] vertices = s.GetVertices();
-            Vector3[] normals = s.GetNormals();
 
             // ASSERT
             // Should have one triangle with three vertices
             Assert.That(triangles, Has.Length.EqualTo(3)); 
             Assert.That(vertices, Has.Length.EqualTo(3));
-            Assert.That(normals, Has.Length.EqualTo(3));
         }
 
         [Test]
@@ -103,14 +101,12 @@ namespace MC_33_Tests
         [Test]
         public void GridGenerateSurface_SingleValue1_OtherValueMinus1_Iso0_GeneratesCorrectTriangle()
         {
-            Vector3 norm = new Vector3(1, 0, 0);
-
             // ARRANGE
             Grid grid = GenerateSingle(1, -1, 0);
             Surface expected = new Surface();
-            expected.AddVertex(new Vector3(0, 0.5f, 0), norm);
-            expected.AddVertex(new Vector3(0.5f, 0, 0), norm);
-            expected.AddVertex(new Vector3(0, 0, 0.5f), norm);
+            expected.AddVertex(new Vector3(0.5f, 0, 0));
+            expected.AddVertex(new Vector3(0, 0.5f, 0));
+            expected.AddVertex(new Vector3(0, 0, 0.5f));
             expected.AddTriangle(0, 1, 2);
 
             // ACT
@@ -122,16 +118,14 @@ namespace MC_33_Tests
         }
 
         [Test]
-        public void GridGenerateSurface_SingleValue1_OtherValueMinus1_Iso0_DoesntGenerateIncorrectTriangle()
+        public void GridGenerateSurface_SingleValueMinus1_OtherValue1_Iso0_GeneratesCorrectTriangle()
         {
-            Vector3 norm = new Vector3(1, 0, 0);
-
             // ARRANGE
-            Grid grid = GenerateSingle(1, -1, 0);
+            Grid grid = GenerateSingle(-1, 1, 0);
             Surface expected = new Surface();
-            expected.AddVertex(new Vector3(0.5f, 0, 0), norm);
-            expected.AddVertex(new Vector3(0, 0.5f, 0), norm);
-            expected.AddVertex(new Vector3(0, 0, 0.5f), norm);
+            expected.AddVertex(new Vector3(0.5f, 0, 0));
+            expected.AddVertex(new Vector3(0, 0, 0.5f));
+            expected.AddVertex(new Vector3(0, 0.5f, 0));
             expected.AddTriangle(0, 1, 2);
 
             // ACT
@@ -139,7 +133,83 @@ namespace MC_33_Tests
             bool areEqual = Surface.AreSurfaceShapesEqual(expected, s);
 
             // ASSERT
-            Assert.IsFalse(areEqual);
+            Assert.IsTrue(areEqual);
+        }
+
+        [Test]
+        public void GridGenerateSurface_SingleValueMinus3_OtherValue1_Iso0_GeneratesCorrectTriangle()
+        {
+            // ARRANGE
+            Grid grid = GenerateSingle(-3, 1, 0);
+            Surface expected = new Surface();
+            expected.AddVertex(new Vector3(0.75f, 0, 0));
+            expected.AddVertex(new Vector3(0, 0, 0.75f));
+            expected.AddVertex(new Vector3(0, 0.75f, 0));
+            expected.AddTriangle(0, 1, 2);
+
+            // ACT
+            Surface s = grid.GenerateSurface(0);
+            bool areEqual = Surface.AreSurfaceShapesEqual(expected, s);
+
+            // ASSERT
+            Assert.IsTrue(areEqual);
+        }
+
+        [Test]
+        public void GridGenerateSurface_SingleValue3_OtherValueMinus1_Iso0_GeneratesCorrectTriangle()
+        {
+            // ARRANGE
+            Grid grid = GenerateSingle(3, -1, 0);
+            Surface expected = new Surface();
+            expected.AddVertex(new Vector3(0.75f, 0, 0));
+            expected.AddVertex(new Vector3(0, 0.75f, 0));
+            expected.AddVertex(new Vector3(0, 0, 0.75f));
+            expected.AddTriangle(0, 1, 2);
+
+            // ACT
+            Surface s = grid.GenerateSurface(0);
+            bool areEqual = Surface.AreSurfaceShapesEqual(expected, s);
+
+            // ASSERT
+            Assert.IsTrue(areEqual);
+        }
+
+        [Test]
+        public void GridGenerateSurface_SingleValue1_OtherValueMinus3_Iso0_GeneratesCorrectTriangle()
+        {
+            // ARRANGE
+            Grid grid = GenerateSingle(1, -3, 0);
+            Surface expected = new Surface();
+            expected.AddVertex(new Vector3(0.25f, 0, 0));
+            expected.AddVertex(new Vector3(0, 0.25f, 0));
+            expected.AddVertex(new Vector3(0, 0, 0.25f));
+            expected.AddTriangle(0, 1, 2);
+
+            // ACT
+            Surface s = grid.GenerateSurface(0);
+            bool areEqual = Surface.AreSurfaceShapesEqual(expected, s);
+
+            // ASSERT
+            Assert.IsTrue(areEqual);
+        }
+
+        [Test]
+        public void GridGenerateSurface_SingleValueMinus1_OtherValue3_Iso0_GeneratesCorrectTriangle()
+        {
+            // ARRANGE
+            Grid grid = GenerateSingle(-1, 3, 0);
+            Surface expected = new Surface();
+            expected.AddVertex(new Vector3(0.25f, 0, 0));
+            expected.AddVertex(new Vector3(0, 0, 0.25f));
+            expected.AddVertex(new Vector3(0, 0.25f, 0));
+            expected.AddTriangle(0, 1, 2);
+
+            // ACT
+            Surface s = grid.GenerateSurface(0);
+            bool areEqual = Surface.AreSurfaceShapesEqual(expected, s);
+
+            // ASSERT
+            Assert.IsTrue(areEqual);
         }
     }
 }

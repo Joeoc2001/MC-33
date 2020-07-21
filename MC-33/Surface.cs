@@ -11,19 +11,17 @@ namespace MC_33
 
         private readonly List<int> triangles = new List<int>();
 		private readonly List<Vector3> vertices = new List<Vector3>();
-		private readonly List<Vector3> normals = new List<Vector3>();
 
-		public int AddVertex(Vector3 pos, Vector3 norm)
-		{
-			int c = vertices.Count;
+        public int AddVertex(Vector3 pos)
+        {
+            int c = vertices.Count;
 
-			vertices.Add(pos);
-			normals.Add(norm);
+            vertices.Add(pos);
 
-			return c;
-		}
+            return c;
+        }
 
-		public void AddTriangle(int p1, int p2, int p3)
+        public void AddTriangle(int p1, int p2, int p3)
 		{
 			triangles.Add(p1);
 			triangles.Add(p2);
@@ -38,11 +36,6 @@ namespace MC_33
 		public Vector3[] GetVertices()
 		{
 			return vertices.ToArray();
-		}
-
-		public Vector3[] GetNormals()
-		{
-			return normals.ToArray();
 		}
 
         public static bool AreTrianglesEqual(Vector3[] t1, Vector3[] t2)

@@ -206,14 +206,14 @@ namespace MC_33
 			//for (i = 0; i < 3; ++i)
 			//	t += n[i] * n[i];
 
-			float t = (float) (1.0 / Math.Sqrt(n[0]*n[0] + n[1]*n[1] + n[2]*n[2]));
-			for (int i = 0; i < 3; ++i)
-				n[i] = t * n[i];
+			//float t = (float) (1.0 / Math.Sqrt(n[0]*n[0] + n[1]*n[1] + n[2]*n[2]));
+			//for (int i = 0; i < 3; ++i)
+			//	n[i] = t * n[i];
 
 			Vector3 pos = new Vector3(r[0], r[1], r[2]);
-			Vector3 norm = new Vector3(n[0], n[1], n[2]);
+			//Vector3 norm = new Vector3(n[0], n[1], n[2]);
 
-			return s.AddVertex(pos, norm);
+			return s.AddVertex(pos);
 
 			//t = invSqrt(t);
 
@@ -947,29 +947,29 @@ namespace MC_33
 					//v2[1] = iso - *V01;
 					//v2[2] = iso - *V11;
 					//v2[3] = iso - *V10;
-					vs[0] = iso - grid[z, y, 0];
-					vs[1] = iso - grid[z, y + 1, 0];
-					vs[2] = iso - grid[z + 1, y + 1, 0];
-					vs[3] = iso - grid[z + 1, y, 0];
+					vs[4] = iso - grid[z, y, 0];
+					vs[5] = iso - grid[z, y + 1, 0];
+					vs[6] = iso - grid[z + 1, y + 1, 0];
+					vs[7] = iso - grid[z + 1, y, 0];
 					//the eight least significant bits of i correspond to vertex indices. (x...x01234567)
 					//If the bit is 1 then the vertex value is greater than zero.
-					i = (((((SignBit(vs[0]) << 1) | SignBit(vs[1])) << 1) | SignBit(vs[2])) << 1) | SignBit(vs[3]);
+					i = (((((SignBit(vs[4]) << 1) | SignBit(vs[5])) << 1) | SignBit(vs[6])) << 1) | SignBit(vs[7]);
 					for (x = 0; x < nx; x++)
 					{
-						vs[4] = vs[0];
-						vs[5] = vs[1];
-						vs[6] = vs[2];
-						vs[7] = vs[3];
+						vs[0] = vs[4];
+						vs[1] = vs[5];
+						vs[2] = vs[6];
+						vs[3] = vs[7];
 
 						//v2[0] = iso - *(++V00);
 						//v2[1] = iso - *(++V01);
 						//v2[2] = iso - *(++V11);
 						//v2[3] = iso - *(++V10);
-						vs[0] = iso - grid[z, y, x + 1];
-						vs[1] = iso - grid[z, y + 1, x + 1];
-						vs[2] = iso - grid[z + 1, y + 1, x + 1];
-						vs[3] = iso - grid[z + 1, y, x + 1];
-						i = ((((((((i & 0x0F) << 1) | SignBit(vs[0])) << 1) | SignBit(vs[1])) << 1) | SignBit(vs[2])) << 1) | SignBit(vs[3]);
+						vs[4] = iso - grid[z, y, x + 1];
+						vs[5] = iso - grid[z, y + 1, x + 1];
+						vs[6] = iso - grid[z + 1, y + 1, x + 1];
+						vs[7] = iso - grid[z + 1, y, x + 1];
+						i = ((((((((i & 0x0F) << 1) | SignBit(vs[4])) << 1) | SignBit(vs[5])) << 1) | SignBit(vs[6])) << 1) | SignBit(vs[7]);
 						if (i != 0 && i != 0xFF)//i is different from 0 and 0xFF
 						{
 							//if (v1 > v2) memcpy(v1 + 4, v2, 4 * sizeof(float));

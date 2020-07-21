@@ -32,12 +32,10 @@ namespace MC_33_Tests
             Surface s = grid.GenerateSurface(iso);
             int[] triangles = s.GetTriangles();
             Vector3[] vertices = s.GetVertices();
-            Vector3[] normals = s.GetNormals();
 
             // ASSERT
             Assert.That(triangles, Has.Length.EqualTo(0));
             Assert.That(vertices, Has.Length.EqualTo(0));
-            Assert.That(normals, Has.Length.EqualTo(0));
         }
 
         [Test]

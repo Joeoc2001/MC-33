@@ -1,8 +1,10 @@
 language: csharp
-solution: MC-33/MC-33.sln
+mono: none
+dotnet: 2.0.0
+
 install:
-  - nuget restore MC-33/MC-33.sln
-  - nuget install NUnit.Console -Version 3.9.0 -OutputDirectory testrunner
+- dotnet restore
+
 script:
-  - msbuild /p:Configuration=Release MC-33/MC-33.sln
-  - mono ./testrunner/NUnit.ConsoleRunner.3.9.0/tools/nunit3-console.exe ./MC-33-Tests/bin/Release/netcoreapp3.1/MC-33-Tests.dll
+ - dotnet build
+ - dotnet test MC-33-Tests/MC-33-Tests.csproj
