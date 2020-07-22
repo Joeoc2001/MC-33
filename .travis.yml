@@ -1,13 +1,12 @@
 language: csharp
 solution: MC-33.sln
-mono: none
-dotnet: 2.0.0
+mono: latest
+dotnet: 3.0
 
 jobs:
   include:
-    - dotnet: 2.0.0
-      mono: none
-      env: DOTNETCORE=2  # optional, can be used to take different code paths in your script
+    - dotnet: 3.0
+      mono: latest
 
 install:
  - dotnet restore

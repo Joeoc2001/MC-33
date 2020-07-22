@@ -2,9 +2,9 @@ using MC_33;
 using NUnit.Framework;
 using System.Numerics;
 
-namespace MC_33_Tests
+namespace MC_33_Tests.CaseSpecificTests
 {
-    public class SingleNodeDifferentCellGenTest
+    public class Case1GenTests
     {
         private Grid GenerateSingle(float valueSingle, float valueOther, int cellVertex)
         {
@@ -93,7 +93,7 @@ namespace MC_33_Tests
 
             // ACT
             Surface s = grid.GenerateSurface(0);
-            bool areEqual = Surface.AreSurfaceShapesEqual(expected, s);
+            bool areEqual = Surface.AreSurfacesEquivalent(expected, s);
 
             // ASSERT
             Assert.IsTrue(areEqual);
@@ -112,7 +112,7 @@ namespace MC_33_Tests
 
             // ACT
             Surface s = grid.GenerateSurface(0);
-            bool areEqual = Surface.AreSurfaceShapesEqual(expected, s);
+            bool areEqual = Surface.AreSurfacesEquivalent(expected, s);
 
             // ASSERT
             Assert.IsTrue(areEqual);
@@ -131,7 +131,7 @@ namespace MC_33_Tests
 
             // ACT
             Surface s = grid.GenerateSurface(0);
-            bool areEqual = Surface.AreSurfaceShapesEqual(expected, s);
+            bool areEqual = Surface.AreSurfacesEquivalent(expected, s);
 
             // ASSERT
             Assert.IsTrue(areEqual);
@@ -150,7 +150,7 @@ namespace MC_33_Tests
 
             // ACT
             Surface s = grid.GenerateSurface(0);
-            bool areEqual = Surface.AreSurfaceShapesEqual(expected, s);
+            bool areEqual = Surface.AreSurfacesEquivalent(expected, s);
 
             // ASSERT
             Assert.IsTrue(areEqual);
@@ -169,7 +169,7 @@ namespace MC_33_Tests
 
             // ACT
             Surface s = grid.GenerateSurface(0);
-            bool areEqual = Surface.AreSurfaceShapesEqual(expected, s);
+            bool areEqual = Surface.AreSurfacesEquivalent(expected, s);
 
             // ASSERT
             Assert.IsTrue(areEqual);
@@ -188,7 +188,7 @@ namespace MC_33_Tests
 
             // ACT
             Surface s = grid.GenerateSurface(0);
-            bool areEqual = Surface.AreSurfaceShapesEqual(expected, s);
+            bool areEqual = Surface.AreSurfacesEquivalent(expected, s);
 
             // ASSERT
             Assert.IsTrue(areEqual);

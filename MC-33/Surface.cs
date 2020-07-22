@@ -63,7 +63,7 @@ namespace MC_33
             return false;
         }
 
-        public static bool AreSurfaceShapesEqual(Surface surface1, Surface surface2)
+        public static bool AreSurfacesEquivalent(Surface surface1, Surface surface2)
         {
             int[] triangles1 = surface1.GetTriangles();
             int[] triangles2 = surface2.GetTriangles();
@@ -114,6 +114,11 @@ namespace MC_33
             }
 
             return true;
+        }
+
+        public bool IsEquivalentTo(Surface s)
+        {
+            return AreSurfacesEquivalent(this, s);
         }
     }
 }

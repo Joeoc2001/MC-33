@@ -169,7 +169,7 @@ namespace MC_33_Tests
             s2.AddTriangle(0, 1, 2);
 
             // ACT
-            bool areEqual = Surface.AreSurfaceShapesEqual(s1, s2);
+            bool areEqual = Surface.AreSurfacesEquivalent(s1, s2);
 
             // ASSERT
             Assert.IsTrue(areEqual);
@@ -192,7 +192,7 @@ namespace MC_33_Tests
             s2.AddTriangle(0, 1, 2);
 
             // ACT
-            bool areEqual = Surface.AreSurfaceShapesEqual(s1, s2);
+            bool areEqual = Surface.AreSurfacesEquivalent(s1, s2);
 
             // ASSERT
             Assert.IsTrue(areEqual);
@@ -214,7 +214,7 @@ namespace MC_33_Tests
             s2.AddTriangle(0, 1, 2);
 
             // ACT
-            bool areEqual = Surface.AreSurfaceShapesEqual(s1, s2);
+            bool areEqual = Surface.AreSurfacesEquivalent(s1, s2);
 
             // ASSERT
             Assert.IsTrue(areEqual);
@@ -236,7 +236,7 @@ namespace MC_33_Tests
             s2.AddTriangle(1, 2, 0);
 
             // ACT
-            bool areEqual = Surface.AreSurfaceShapesEqual(s1, s2);
+            bool areEqual = Surface.AreSurfacesEquivalent(s1, s2);
 
             // ASSERT
             Assert.IsTrue(areEqual);
@@ -258,7 +258,7 @@ namespace MC_33_Tests
             s2.AddTriangle(2, 0, 1);
 
             // ACT
-            bool areEqual = Surface.AreSurfaceShapesEqual(s1, s2);
+            bool areEqual = Surface.AreSurfacesEquivalent(s1, s2);
 
             // ASSERT
             Assert.IsTrue(areEqual);
@@ -280,7 +280,7 @@ namespace MC_33_Tests
             s2.AddTriangle(0, 1, 2);
 
             // ACT
-            bool areEqual = Surface.AreSurfaceShapesEqual(s1, s2);
+            bool areEqual = Surface.AreSurfacesEquivalent(s1, s2);
 
             // ASSERT
             Assert.IsFalse(areEqual);
@@ -302,7 +302,7 @@ namespace MC_33_Tests
             s2.AddTriangle(0, 1, 2);
 
             // ACT
-            bool areEqual = Surface.AreSurfaceShapesEqual(s1, s2);
+            bool areEqual = Surface.AreSurfacesEquivalent(s1, s2);
 
             // ASSERT
             Assert.IsFalse(areEqual);
@@ -324,7 +324,7 @@ namespace MC_33_Tests
             s2.AddTriangle(0, 1, 2);
 
             // ACT
-            bool areEqual = Surface.AreSurfaceShapesEqual(s1, s2);
+            bool areEqual = Surface.AreSurfacesEquivalent(s1, s2);
 
             // ASSERT
             Assert.IsFalse(areEqual);
@@ -346,7 +346,7 @@ namespace MC_33_Tests
             s2.AddTriangle(0, 2, 1);
 
             // ACT
-            bool areEqual = Surface.AreSurfaceShapesEqual(s1, s2);
+            bool areEqual = Surface.AreSurfacesEquivalent(s1, s2);
 
             // ASSERT
             Assert.IsFalse(areEqual);
@@ -368,7 +368,7 @@ namespace MC_33_Tests
             s2.AddTriangle(2, 1, 0);
 
             // ACT
-            bool areEqual = Surface.AreSurfaceShapesEqual(s1, s2);
+            bool areEqual = Surface.AreSurfacesEquivalent(s1, s2);
 
             // ASSERT
             Assert.IsFalse(areEqual);
@@ -390,7 +390,7 @@ namespace MC_33_Tests
             s2.AddTriangle(1, 0, 2);
 
             // ACT
-            bool areEqual = Surface.AreSurfaceShapesEqual(s1, s2);
+            bool areEqual = Surface.AreSurfacesEquivalent(s1, s2);
 
             // ASSERT
             Assert.IsFalse(areEqual);
@@ -420,7 +420,7 @@ namespace MC_33_Tests
             s2.AddTriangle(3, 4, 5);
 
             // ACT
-            bool areEqual = Surface.AreSurfaceShapesEqual(s1, s2);
+            bool areEqual = Surface.AreSurfacesEquivalent(s1, s2);
 
             // ASSERT
             Assert.IsTrue(areEqual);
@@ -450,7 +450,7 @@ namespace MC_33_Tests
             s2.AddTriangle(3, 4, 5);
 
             // ACT
-            bool areEqual = Surface.AreSurfaceShapesEqual(s1, s2);
+            bool areEqual = Surface.AreSurfacesEquivalent(s1, s2);
 
             // ASSERT
             Assert.IsTrue(areEqual);
@@ -480,7 +480,7 @@ namespace MC_33_Tests
             s2.AddTriangle(3, 4, 5);
 
             // ACT
-            bool areEqual = Surface.AreSurfaceShapesEqual(s1, s2);
+            bool areEqual = Surface.AreSurfacesEquivalent(s1, s2);
 
             // ASSERT
             Assert.IsTrue(areEqual);
@@ -506,7 +506,7 @@ namespace MC_33_Tests
             s2.AddTriangle(3, 4, 5);
 
             // ACT
-            bool areEqual = Surface.AreSurfaceShapesEqual(s1, s2);
+            bool areEqual = Surface.AreSurfacesEquivalent(s1, s2);
 
             // ASSERT
             Assert.IsFalse(areEqual);
@@ -534,7 +534,7 @@ namespace MC_33_Tests
             s2.AddTriangle(3, 4, 5);
 
             // ACT
-            bool areEqual = Surface.AreSurfaceShapesEqual(s1, s2);
+            bool areEqual = Surface.AreSurfacesEquivalent(s1, s2);
 
             // ASSERT
             Assert.IsTrue(areEqual);
@@ -561,7 +561,7 @@ namespace MC_33_Tests
             s2.AddTriangle(0, 3, 4);
 
             // ACT
-            bool areEqual = Surface.AreSurfaceShapesEqual(s1, s2);
+            bool areEqual = Surface.AreSurfacesEquivalent(s1, s2);
 
             // ASSERT
             Assert.IsTrue(areEqual);

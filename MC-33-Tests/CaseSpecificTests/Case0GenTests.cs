@@ -2,9 +2,9 @@ using MC_33;
 using NUnit.Framework;
 using System.Numerics;
 
-namespace MC_33_Tests
+namespace MC_33_Tests.CaseSpecificTests
 {
-    public class UniformGenTest
+    public class Case0GenTests
     {
         private Grid GenerateUniform(float value, int width)
         {
