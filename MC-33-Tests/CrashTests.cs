@@ -9,11 +9,9 @@ namespace MC_33_Tests
 {
     class CrashTests
     {
-        private const int r = 1;
-
         [Test]
-        public void CrashTests_NoBasicCell_Crashes([Range(-r, r)] int a, [Range(-r, r)] int b, [Range(-r, r)] int c, [Range(-r, r)] int d,
-            [Range(-r, r)] int e, [Range(-r, r)] int f, [Range(-r, r)] int g, [Range(-r, r)] int h)
+        public void CrashTests_NoBasicCell_Crashes_101([Range(-1, 1)] int a, [Range(-1, 1)] int b, [Range(-1, 1)] int c, [Range(-1, 1)] int d,
+            [Range(-1, 1)] int e, [Range(-1, 1)] int f, [Range(-1, 1)] int g, [Range(-1, 1)] int h)
         {
             // ARRANGE
             float[,,] cells = new float[,,] {
