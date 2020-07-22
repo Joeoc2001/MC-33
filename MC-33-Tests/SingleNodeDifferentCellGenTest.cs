@@ -45,57 +45,39 @@ namespace MC_33_Tests
         }
 
         [Test]
-        public void GridGenerateSurface_SingleValue1_OtherValueMinus1_Iso0_GeneratesSingleTriangle()
+        public void GridGenerateSurface_SingleValue1_OtherValueMinus1_Iso0_GeneratesSingleTriangle([Range(0, 7)] int i)
         {
-            for (int i = 0; i < 8; i++)
-            {
-                SingleNodeCellTest(1, -1, i, 0);
-            }
+            SingleNodeCellTest(1, -1, i, 0);
         }
 
         [Test]
-        public void GridGenerateSurface_SingleValue2_OtherValueMinus1_Iso0_GeneratesSingleTriangle()
+        public void GridGenerateSurface_SingleValue2_OtherValueMinus1_Iso0_GeneratesSingleTriangle([Range(0, 7)] int i)
         {
-            for (int i = 0; i < 8; i++)
-            {
-                SingleNodeCellTest(2, -1, i, 0);
-            }
+            SingleNodeCellTest(2, -1, i, 0);
         }
 
         [Test]
-        public void GridGenerateSurface_SingleValue2_OtherValueMinus1_Iso1_GeneratesSingleTriangle()
+        public void GridGenerateSurface_SingleValue2_OtherValueMinus1_Iso1_GeneratesSingleTriangle([Range(0, 7)] int i)
         {
-            for (int i = 0; i < 8; i++)
-            {
-                SingleNodeCellTest(2, -1, i, 1);
-            }
+            SingleNodeCellTest(2, -1, i, 1);
         }
 
         [Test]
-        public void GridGenerateSurface_SingleValueMinus1_OtherValue1_Iso0_GeneratesSingleTriangle()
+        public void GridGenerateSurface_SingleValueMinus1_OtherValue1_Iso0_GeneratesSingleTriangle([Range(0, 7)] int i)
         {
-            for (int i = 0; i < 8; i++)
-            {
-                SingleNodeCellTest(-1, 1, i, 0);
-            }
+            SingleNodeCellTest(-1, 1, i, 0);
         }
 
         [Test]
-        public void GridGenerateSurface_SingleValueMinus2_OtherValue1_Iso0_GeneratesSingleTriangle()
+        public void GridGenerateSurface_SingleValueMinus2_OtherValue1_Iso0_GeneratesSingleTriangle([Range(0, 7)] int i)
         {
-            for (int i = 0; i < 8; i++)
-            {
-                SingleNodeCellTest(-2, 1, i, 0);
-            }
+            SingleNodeCellTest(-2, 1, i, 0);
         }
 
         [Test]
-        public void GridGenerateSurface_SingleValueMinus2_OtherValue1_IsoMinus1_GeneratesSingleTriangle()
+        public void GridGenerateSurface_SingleValueMinus2_OtherValue1_IsoMinus1_GeneratesSingleTriangle([Range(0, 7)] int i)
         {
-            for (int i = 0; i < 8; i++)
-            {
-                SingleNodeCellTest(-2, 1, i, -1);
-            }
+            SingleNodeCellTest(-2, 1, i, -1);
         }
 
         [Test]

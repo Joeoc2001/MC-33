@@ -1,9 +1,16 @@
 language: csharp
+solution: MC-33.sln
 mono: none
 dotnet: 2.0.0
 
+jobs:
+  include:
+    - dotnet: 2.0.0
+      mono: none
+      env: DOTNETCORE=2  # optional, can be used to take different code paths in your script
+
 install:
-- dotnet restore
+ - dotnet restore
 
 script:
  - dotnet build

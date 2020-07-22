@@ -10,55 +10,36 @@ namespace MC_33_Tests
     public class VectorAlgorithmsTests
     {
         [Test]
-        public void TestingFunctions_VectorsApproxEqual_TrueForAllFromMinus10To10()
+        public void TestingFunctions_VectorsApproxEqual_TrueForAllFromMinus10To10([Range(-5, 5)] int i, [Range(-5, 5)] int j, [Range(-5, 5)] int k)
         {
-            for (int i = -10; i <= 10; i++)
-            {
-                for (int j = -10; j <= 10; j++)
-                {
-                    for (int k = -10; k <= 10; k++)
-                    {
-                        // ARRANGE
-                        Vector3 v1 = new Vector3(i, j, k);
-                        Vector3 v2 = new Vector3(i, j, k);
+                // ARRANGE
+                Vector3 v1 = new Vector3(i, j, k);
+                Vector3 v2 = new Vector3(i, j, k);
 
-                        // ACT
-                        bool areEqual = v1.EqualsApproximately(v2, 0.00000001);
+                // ACT
+                bool areEqual = v1.EqualsApproximately(v2, 0.00000001);
 
-                        // ASSERT
-                        Assert.IsTrue(areEqual);
-                    }
-                }
-            }
+                // ASSERT
+                Assert.IsTrue(areEqual);
         }
 
         [Test]
-        public void TestingFunctions_VectorsApproxEqual_FalseForAllFromMinus10To10IfNotOne()
+        public void TestingFunctions_VectorsApproxEqual_FalseForAllFromMinus10To10IfNotOne([Range(-5, 5)] int i, [Range(-5, 5)] int j, [Range(-5, 5)] int k)
         {
-            Vector3 v1 = new Vector3(1, 1, 1);
-
-            for (int i = -10; i <= 10; i++)
+            if (i == 1 && j == 1 && k == 1)
             {
-                for (int j = -10; j <= 10; j++)
-                {
-                    for (int k = -10; k <= 10; k++)
-                    {
-                        if (i == 1 && j == 1 && k == 1)
-                        {
-                            continue;
-                        }
-
-                        // ARRANGE
-                        Vector3 v2 = new Vector3(i, j, k);
-
-                        // ACT
-                        bool areEqual = v1.EqualsApproximately(v2, 0.00000001);
-
-                        // ASSERT
-                        Assert.IsFalse(areEqual);
-                    }
-                }
+                return;
             }
+
+            // ARRANGE
+            Vector3 v1 = new Vector3(1, 1, 1);
+            Vector3 v2 = new Vector3(i, j, k);
+
+            // ACT
+            bool areEqual = v1.EqualsApproximately(v2, 0.00000001);
+
+            // ASSERT
+            Assert.IsFalse(areEqual);
         }
     }
 }
