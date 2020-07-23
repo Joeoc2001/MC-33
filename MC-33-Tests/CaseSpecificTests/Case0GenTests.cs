@@ -6,7 +6,7 @@ namespace MC_33_Tests.CaseSpecificTests
 {
     public class Case0GenTests
     {
-        private Grid GenerateUniform(float value, int width)
+        private ArrayGrid GenerateUniform(float value, int width)
         {
             float[,,] values = new float[width, width, width];
             for (int i = 0; i < width; i++)
@@ -20,13 +20,13 @@ namespace MC_33_Tests.CaseSpecificTests
                 }
             }
 
-            return new Grid(values, Vector3.Zero, Vector3.One);
+            return new ArrayGrid(values, Vector3.Zero, Vector3.One);
         }
 
         private void UniformTest(float value, int width, float iso)
         {
             // ARRANGE
-            Grid grid = GenerateUniform(value, width);
+            ArrayGrid grid = GenerateUniform(value, width);
 
             // ACT
             Surface s = grid.GenerateSurface(iso);

@@ -157,12 +157,12 @@ namespace MC_33_Tests
         public void Surface_Equal_TrueForSameTriangles()
         {
             // ARRANGE
-            Surface s1 = new Surface();
+            Surface s1 = new ListSurface();
             s1.AddVertex(new Vector3(0, 0, 0));
             s1.AddVertex(new Vector3(1, 0, 0));
             s1.AddVertex(new Vector3(0, 1, 0));
             s1.AddTriangle(0, 1, 2);
-            Surface s2 = new Surface();
+            Surface s2 = new ListSurface();
             s2.AddVertex(new Vector3(0, 0, 0));
             s2.AddVertex(new Vector3(1, 0, 0));
             s2.AddVertex(new Vector3(0, 1, 0));
@@ -180,12 +180,12 @@ namespace MC_33_Tests
         public void Surface_Equal_TrueForSameWindingsVertex1()
         {
             // ARRANGE
-            Surface s1 = new Surface();
+            Surface s1 = new ListSurface();
             s1.AddVertex(new Vector3(0, 0, 0));
             s1.AddVertex(new Vector3(1, 0, 0));
             s1.AddVertex(new Vector3(0, 1, 0));
             s1.AddTriangle(0, 1, 2);
-            Surface s2 = new Surface();
+            Surface s2 = new ListSurface();
             s2.AddVertex(new Vector3(1, 0, 0));
             s2.AddVertex(new Vector3(0, 1, 0));
             s2.AddVertex(new Vector3(0, 0, 0));
@@ -202,12 +202,12 @@ namespace MC_33_Tests
         public void Surface_Equal_TrueForSameWindingsVertex2()
         {
             // ARRANGE
-            Surface s1 = new Surface();
+            Surface s1 = new ListSurface();
             s1.AddVertex(new Vector3(0, 0, 0));
             s1.AddVertex(new Vector3(1, 0, 0));
             s1.AddVertex(new Vector3(0, 1, 0));
             s1.AddTriangle(0, 1, 2);
-            Surface s2 = new Surface();
+            Surface s2 = new ListSurface();
             s2.AddVertex(new Vector3(0, 1, 0));
             s2.AddVertex(new Vector3(0, 0, 0));
             s2.AddVertex(new Vector3(1, 0, 0));
@@ -224,12 +224,12 @@ namespace MC_33_Tests
         public void Surface_Equal_TrueForSameWindingsTriangle1()
         {
             // ARRANGE
-            Surface s1 = new Surface();
+            Surface s1 = new ListSurface();
             s1.AddVertex(new Vector3(0, 0, 0));
             s1.AddVertex(new Vector3(1, 0, 0));
             s1.AddVertex(new Vector3(0, 1, 0));
             s1.AddTriangle(0, 1, 2);
-            Surface s2 = new Surface();
+            Surface s2 = new ListSurface();
             s2.AddVertex(new Vector3(0, 0, 0));
             s2.AddVertex(new Vector3(1, 0, 0));
             s2.AddVertex(new Vector3(0, 1, 0));
@@ -246,12 +246,12 @@ namespace MC_33_Tests
         public void Surface_Equal_TrueForSameWindingsTriangle2()
         {
             // ARRANGE
-            Surface s1 = new Surface();
+            Surface s1 = new ListSurface();
             s1.AddVertex(new Vector3(0, 0, 0));
             s1.AddVertex(new Vector3(1, 0, 0));
             s1.AddVertex(new Vector3(0, 1, 0));
             s1.AddTriangle(0, 1, 2);
-            Surface s2 = new Surface();
+            Surface s2 = new ListSurface();
             s2.AddVertex(new Vector3(0, 0, 0));
             s2.AddVertex(new Vector3(1, 0, 0));
             s2.AddVertex(new Vector3(0, 1, 0));
@@ -268,12 +268,12 @@ namespace MC_33_Tests
         public void Surface_Equal_FalseForDifferentWindingsVertex1()
         {
             // ARRANGE
-            Surface s1 = new Surface();
+            Surface s1 = new ListSurface();
             s1.AddVertex(new Vector3(0, 0, 0));
             s1.AddVertex(new Vector3(1, 0, 0));
             s1.AddVertex(new Vector3(0, 1, 0));
             s1.AddTriangle(0, 1, 2);
-            Surface s2 = new Surface();
+            Surface s2 = new ListSurface();
             s2.AddVertex(new Vector3(0, 0, 0));
             s2.AddVertex(new Vector3(0, 1, 0));
             s2.AddVertex(new Vector3(1, 0, 0));
@@ -290,12 +290,12 @@ namespace MC_33_Tests
         public void Surface_Equal_FalseForDifferentWindingsVertex2()
         {
             // ARRANGE
-            Surface s1 = new Surface();
+            Surface s1 = new ListSurface();
             s1.AddVertex(new Vector3(0, 0, 0));
             s1.AddVertex(new Vector3(1, 0, 0));
             s1.AddVertex(new Vector3(0, 1, 0));
             s1.AddTriangle(0, 1, 2);
-            Surface s2 = new Surface();
+            Surface s2 = new ListSurface();
             s2.AddVertex(new Vector3(0, 1, 0));
             s2.AddVertex(new Vector3(1, 0, 0));
             s2.AddVertex(new Vector3(0, 0, 0));
@@ -312,12 +312,12 @@ namespace MC_33_Tests
         public void Surface_Equal_FalseForDifferentWindingsVertex3()
         {
             // ARRANGE
-            Surface s1 = new Surface();
+            Surface s1 = new ListSurface();
             s1.AddVertex(new Vector3(0, 0, 0));
             s1.AddVertex(new Vector3(1, 0, 0));
             s1.AddVertex(new Vector3(0, 1, 0));
             s1.AddTriangle(0, 1, 2);
-            Surface s2 = new Surface();
+            Surface s2 = new ListSurface();
             s2.AddVertex(new Vector3(1, 0, 0));
             s2.AddVertex(new Vector3(0, 0, 0));
             s2.AddVertex(new Vector3(0, 1, 0));
@@ -334,12 +334,12 @@ namespace MC_33_Tests
         public void Surface_Equal_FalseForDifferentWindingsTriangle1()
         {
             // ARRANGE
-            Surface s1 = new Surface();
+            Surface s1 = new ListSurface();
             s1.AddVertex(new Vector3(0, 0, 0));
             s1.AddVertex(new Vector3(1, 0, 0));
             s1.AddVertex(new Vector3(0, 1, 0));
             s1.AddTriangle(0, 1, 2);
-            Surface s2 = new Surface();
+            Surface s2 = new ListSurface();
             s2.AddVertex(new Vector3(0, 0, 0));
             s2.AddVertex(new Vector3(1, 0, 0));
             s2.AddVertex(new Vector3(0, 1, 0));
@@ -356,12 +356,12 @@ namespace MC_33_Tests
         public void Surface_Equal_FalseForDifferentWindingsTriangle2()
         {
             // ARRANGE
-            Surface s1 = new Surface();
+            Surface s1 = new ListSurface();
             s1.AddVertex(new Vector3(0, 0, 0));
             s1.AddVertex(new Vector3(1, 0, 0));
             s1.AddVertex(new Vector3(0, 1, 0));
             s1.AddTriangle(0, 1, 2);
-            Surface s2 = new Surface();
+            Surface s2 = new ListSurface();
             s2.AddVertex(new Vector3(0, 0, 0));
             s2.AddVertex(new Vector3(1, 0, 0));
             s2.AddVertex(new Vector3(0, 1, 0));
@@ -378,12 +378,12 @@ namespace MC_33_Tests
         public void Surface_Equal_FalseForDifferentWindingsTriangle3()
         {
             // ARRANGE
-            Surface s1 = new Surface();
+            Surface s1 = new ListSurface();
             s1.AddVertex(new Vector3(0, 0, 0));
             s1.AddVertex(new Vector3(1, 0, 0));
             s1.AddVertex(new Vector3(0, 1, 0));
             s1.AddTriangle(0, 1, 2);
-            Surface s2 = new Surface();
+            Surface s2 = new ListSurface();
             s2.AddVertex(new Vector3(0, 0, 0));
             s2.AddVertex(new Vector3(1, 0, 0));
             s2.AddVertex(new Vector3(0, 1, 0));
@@ -400,7 +400,7 @@ namespace MC_33_Tests
         public void Surface_Equal_True_ForTwoTriangles_Same()
         {
             // ARRANGE
-            Surface s1 = new Surface();
+            Surface s1 = new ListSurface();
             s1.AddVertex(new Vector3(0, 0, 0));
             s1.AddVertex(new Vector3(1, 0, 0));
             s1.AddVertex(new Vector3(0, 1, 0));
@@ -409,7 +409,7 @@ namespace MC_33_Tests
             s1.AddVertex(new Vector3(1, 1, 0));
             s1.AddTriangle(0, 1, 2);
             s1.AddTriangle(3, 4, 5);
-            Surface s2 = new Surface();
+            Surface s2 = new ListSurface();
             s2.AddVertex(new Vector3(0, 0, 0));
             s2.AddVertex(new Vector3(1, 0, 0));
             s2.AddVertex(new Vector3(0, 1, 0));
@@ -430,7 +430,7 @@ namespace MC_33_Tests
         public void Surface_Equal_True_ForTwoTriangles_FlippedTriangles()
         {
             // ARRANGE
-            Surface s1 = new Surface();
+            Surface s1 = new ListSurface();
             s1.AddVertex(new Vector3(0, 0, 0));
             s1.AddVertex(new Vector3(1, 0, 0));
             s1.AddVertex(new Vector3(0, 1, 0));
@@ -439,7 +439,7 @@ namespace MC_33_Tests
             s1.AddVertex(new Vector3(1, 1, 0));
             s1.AddTriangle(3, 4, 5);
             s1.AddTriangle(0, 1, 2);
-            Surface s2 = new Surface();
+            Surface s2 = new ListSurface();
             s2.AddVertex(new Vector3(0, 0, 0));
             s2.AddVertex(new Vector3(1, 0, 0));
             s2.AddVertex(new Vector3(0, 1, 0));
@@ -460,7 +460,7 @@ namespace MC_33_Tests
         public void Surface_Equal_True_ForTwoTriangles_FlippedVertices()
         {
             // ARRANGE
-            Surface s1 = new Surface();
+            Surface s1 = new ListSurface();
             s1.AddVertex(new Vector3(0, 0, 0));
             s1.AddVertex(new Vector3(1, 0, 0));
             s1.AddVertex(new Vector3(1, 1, 0));
@@ -469,7 +469,7 @@ namespace MC_33_Tests
             s1.AddVertex(new Vector3(0, 1, 0));
             s1.AddTriangle(0, 1, 2);
             s1.AddTriangle(3, 4, 5);
-            Surface s2 = new Surface();
+            Surface s2 = new ListSurface();
             s2.AddVertex(new Vector3(0, 0, 0));
             s2.AddVertex(new Vector3(1, 0, 0));
             s2.AddVertex(new Vector3(0, 1, 0));
@@ -490,12 +490,12 @@ namespace MC_33_Tests
         public void Surface_Equal_False_ForOneVsTwoTriangles()
         {
             // ARRANGE
-            Surface s1 = new Surface();
+            Surface s1 = new ListSurface();
             s1.AddVertex(new Vector3(0, 0, 0));
             s1.AddVertex(new Vector3(1, 0, 0));
             s1.AddVertex(new Vector3(1, 1, 0));
             s1.AddTriangle(0, 1, 2);
-            Surface s2 = new Surface();
+            Surface s2 = new ListSurface();
             s2.AddVertex(new Vector3(0, 0, 0));
             s2.AddVertex(new Vector3(1, 0, 0));
             s2.AddVertex(new Vector3(0, 1, 0));
@@ -516,14 +516,14 @@ namespace MC_33_Tests
         public void Surface_Equal_True_ForTwoTriangles_SharedVertices()
         {
             // ARRANGE
-            Surface s1 = new Surface();
+            Surface s1 = new ListSurface();
             s1.AddVertex(new Vector3(0, 0, 0));
             s1.AddVertex(new Vector3(1, 0, 0));
             s1.AddVertex(new Vector3(0, 1, 0));
             s1.AddVertex(new Vector3(1, 1, 0));
             s1.AddTriangle(0, 1, 2);
             s1.AddTriangle(0, 1, 3);
-            Surface s2 = new Surface();
+            Surface s2 = new ListSurface();
             s2.AddVertex(new Vector3(0, 0, 0));
             s2.AddVertex(new Vector3(1, 0, 0));
             s2.AddVertex(new Vector3(0, 1, 0));
@@ -544,14 +544,14 @@ namespace MC_33_Tests
         public void Surface_Equal_True_ForTwoTriangles_SharedVertices2()
         {
             // ARRANGE
-            Surface s1 = new Surface();
+            Surface s1 = new ListSurface();
             s1.AddVertex(new Vector3(0, 0, 0));
             s1.AddVertex(new Vector3(1, 0, 0));
             s1.AddVertex(new Vector3(0, 1, 0));
             s1.AddVertex(new Vector3(1, 1, 0));
             s1.AddTriangle(0, 1, 2);
             s1.AddTriangle(0, 1, 3);
-            Surface s2 = new Surface();
+            Surface s2 = new ListSurface();
             s2.AddVertex(new Vector3(0, 0, 0));
             s2.AddVertex(new Vector3(1, 0, 0));
             s2.AddVertex(new Vector3(0, 1, 0));

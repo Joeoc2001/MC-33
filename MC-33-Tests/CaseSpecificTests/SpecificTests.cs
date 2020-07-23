@@ -15,7 +15,7 @@ namespace MC_33_Tests.CaseSpecificTests
         /// <param name="expected">The surface that is expected to be generated</param>
         public static bool TestSpecific(float[,,] cells, Surface expected)
         {
-            Grid grid = new Grid(cells, Vector3.Zero, Vector3.One);
+            ArrayGrid grid = new ArrayGrid(cells, Vector3.Zero, Vector3.One);
             Surface s = grid.GenerateSurface(0);
             return Surface.AreSurfacesEquivalent(expected, s);
         }

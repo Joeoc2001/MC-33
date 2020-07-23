@@ -6,7 +6,7 @@ namespace MC_33_Tests.CaseSpecificTests
 {
     public class Case1GenTests
     {
-        private Grid GenerateSingle(float valueSingle, float valueOther, int cellVertex)
+        private ArrayGrid GenerateSingle(float valueSingle, float valueOther, int cellVertex)
         {
             float[,,] values = new float[2, 2, 2];
             for (int i = 0; i < 2; i++)
@@ -15,7 +15,7 @@ namespace MC_33_Tests.CaseSpecificTests
                 {
                     for (int k = 0; k < 2; k++)
                     {
-                        values[i, j, k] = valueOther;
+                        values[k, j, i] = valueOther;
                     }
                 }
             }
@@ -25,13 +25,13 @@ namespace MC_33_Tests.CaseSpecificTests
             int z = (cellVertex & 0x04) >> 2;
             values[z, y, x] = valueSingle;
 
-            return new Grid(values, Vector3.Zero, Vector3.One);
+            return new ArrayGrid(values, Vector3.Zero, Vector3.One);
         }
 
         private void SingleNodeCellTest(float valueSingle, float valueOther, int cellVertex, float iso)
         {
             // ARRANGE
-            Grid grid = GenerateSingle(valueSingle, valueOther, cellVertex);
+            ArrayGrid grid = GenerateSingle(valueSingle, valueOther, cellVertex);
 
             // ACT
             Surface s = grid.GenerateSurface(iso);
@@ -84,8 +84,8 @@ namespace MC_33_Tests.CaseSpecificTests
         public void GridGenerateSurface_SingleValue1_OtherValueMinus1_Iso0_GeneratesCorrectTriangle()
         {
             // ARRANGE
-            Grid grid = GenerateSingle(1, -1, 0);
-            Surface expected = new Surface();
+            ArrayGrid grid = GenerateSingle(1, -1, 0);
+            Surface expected = new ListSurface();
             expected.AddVertex(new Vector3(0.5f, 0, 0));
             expected.AddVertex(new Vector3(0, 0.5f, 0));
             expected.AddVertex(new Vector3(0, 0, 0.5f));
@@ -103,8 +103,8 @@ namespace MC_33_Tests.CaseSpecificTests
         public void GridGenerateSurface_SingleValueMinus1_OtherValue1_Iso0_GeneratesCorrectTriangle()
         {
             // ARRANGE
-            Grid grid = GenerateSingle(-1, 1, 0);
-            Surface expected = new Surface();
+            ArrayGrid grid = GenerateSingle(-1, 1, 0);
+            Surface expected = new ListSurface();
             expected.AddVertex(new Vector3(0.5f, 0, 0));
             expected.AddVertex(new Vector3(0, 0, 0.5f));
             expected.AddVertex(new Vector3(0, 0.5f, 0));
@@ -122,8 +122,8 @@ namespace MC_33_Tests.CaseSpecificTests
         public void GridGenerateSurface_SingleValueMinus3_OtherValue1_Iso0_GeneratesCorrectTriangle()
         {
             // ARRANGE
-            Grid grid = GenerateSingle(-3, 1, 0);
-            Surface expected = new Surface();
+            ArrayGrid grid = GenerateSingle(-3, 1, 0);
+            Surface expected = new ListSurface();
             expected.AddVertex(new Vector3(0.75f, 0, 0));
             expected.AddVertex(new Vector3(0, 0, 0.75f));
             expected.AddVertex(new Vector3(0, 0.75f, 0));
@@ -141,8 +141,8 @@ namespace MC_33_Tests.CaseSpecificTests
         public void GridGenerateSurface_SingleValue3_OtherValueMinus1_Iso0_GeneratesCorrectTriangle()
         {
             // ARRANGE
-            Grid grid = GenerateSingle(3, -1, 0);
-            Surface expected = new Surface();
+            ArrayGrid grid = GenerateSingle(3, -1, 0);
+            Surface expected = new ListSurface();
             expected.AddVertex(new Vector3(0.75f, 0, 0));
             expected.AddVertex(new Vector3(0, 0.75f, 0));
             expected.AddVertex(new Vector3(0, 0, 0.75f));
@@ -160,8 +160,8 @@ namespace MC_33_Tests.CaseSpecificTests
         public void GridGenerateSurface_SingleValue1_OtherValueMinus3_Iso0_GeneratesCorrectTriangle()
         {
             // ARRANGE
-            Grid grid = GenerateSingle(1, -3, 0);
-            Surface expected = new Surface();
+            ArrayGrid grid = GenerateSingle(1, -3, 0);
+            Surface expected = new ListSurface();
             expected.AddVertex(new Vector3(0.25f, 0, 0));
             expected.AddVertex(new Vector3(0, 0.25f, 0));
             expected.AddVertex(new Vector3(0, 0, 0.25f));
@@ -179,8 +179,8 @@ namespace MC_33_Tests.CaseSpecificTests
         public void GridGenerateSurface_SingleValueMinus1_OtherValue3_Iso0_GeneratesCorrectTriangle()
         {
             // ARRANGE
-            Grid grid = GenerateSingle(-1, 3, 0);
-            Surface expected = new Surface();
+            ArrayGrid grid = GenerateSingle(-1, 3, 0);
+            Surface expected = new ListSurface();
             expected.AddVertex(new Vector3(0.25f, 0, 0));
             expected.AddVertex(new Vector3(0, 0, 0.25f));
             expected.AddVertex(new Vector3(0, 0.25f, 0));

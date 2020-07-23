@@ -14,12 +14,12 @@ namespace MC_33_Tests.CaseSpecificTests
         {
             // ARRANGE
             float[,,] cells = new float[,,] {
-                { {  1,  1 }, {  1,  1 } },
-                { { -1, -1 }, { -1, -1 } }
+                { {  1, -1 }, {  1, -1 } },
+                { {  1, -1 }, {  1, -1 } }
             };
 
             // Two valid surfaces
-            Surface expected1 = new Surface();
+            Surface expected1 = new ListSurface();
             expected1.AddVertex(new Vector3(0, 0, 0.5f));
             expected1.AddVertex(new Vector3(1, 0, 0.5f));
             expected1.AddVertex(new Vector3(1, 1, 0.5f));
@@ -27,7 +27,7 @@ namespace MC_33_Tests.CaseSpecificTests
             expected1.AddTriangle(0, 1, 2);
             expected1.AddTriangle(0, 2, 3);
 
-            Surface expected2 = new Surface();
+            Surface expected2 = new ListSurface();
             expected2.AddVertex(new Vector3(0, 1, 0.5f));
             expected2.AddVertex(new Vector3(0, 0, 0.5f));
             expected2.AddVertex(new Vector3(1, 0, 0.5f));
@@ -45,12 +45,12 @@ namespace MC_33_Tests.CaseSpecificTests
         {
             // ARRANGE
             float[,,] cells = new float[,,] {
-                { { -1, -1 }, { -1, -1 } },
-                { {  1,  1 }, {  1,  1 } }
+                { { -1,  1 }, { -1,  1 } },
+                { { -1,  1 }, { -1,  1 } }
             };
 
             // Two valid surfaces
-            Surface expected1 = new Surface();
+            Surface expected1 = new ListSurface();
             expected1.AddVertex(new Vector3(0, 0, 0.5f));
             expected1.AddVertex(new Vector3(1, 0, 0.5f));
             expected1.AddVertex(new Vector3(1, 1, 0.5f));
@@ -58,7 +58,7 @@ namespace MC_33_Tests.CaseSpecificTests
             expected1.AddTriangle(0, 2, 1);
             expected1.AddTriangle(0, 3, 2);
 
-            Surface expected2 = new Surface();
+            Surface expected2 = new ListSurface();
             expected2.AddVertex(new Vector3(0, 1, 0.5f));
             expected2.AddVertex(new Vector3(0, 0, 0.5f));
             expected2.AddVertex(new Vector3(1, 0, 0.5f));

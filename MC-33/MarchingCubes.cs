@@ -160,7 +160,7 @@ namespace MC_33
 		Assign memory for the vertex r[3], normal n[3]. The return value is the new
 		vertex label.
 		*/
-		static int store_point_normal(Surface s, float[] r, float[] n)
+		static int store_point_normal(Grid grid, Surface s, float[] r, float[] n)
 		{
 			//int i, nv = (++surface->nV) & _MC_A;
 			//float t = 0.0f, *p;
@@ -211,6 +211,8 @@ namespace MC_33
 			//	n[i] = t * n[i];
 
 			Vector3 pos = new Vector3(r[0], r[1], r[2]);
+			pos *= grid.Offset;
+			pos += grid.Origin;
 			//Vector3 norm = new Vector3(n[0], n[1], n[2]);
 
 			return s.AddVertex(pos);
@@ -237,24 +239,24 @@ namespace MC_33
 		{
 			r[0] = x; r[1] = y; r[2] = z;
 			if (x == 0)
-				n[0] = grid[z, y, 0] - grid[z, y, 1];
+				n[0] = grid[0, y, z] - grid[1, y, z];
 			else if (x == grid.SizeX)
-				n[0] = grid[z, y, x - 1] - grid[z, y, x];
+				n[0] = grid[x - 1, y, z] - grid[x, y, z];
 			else
-				n[0] = 0.5f * (grid[z, y, x - 1] - grid[z, y, x + 1]);
+				n[0] = 0.5f * (grid[x - 1, y, z] - grid[x + 1, y, z]);
 			if (y == 0)
-				n[1] = grid[z, 0, x] - grid[z, 1, x];
+				n[1] = grid[x, 0, z] - grid[x, 1, z];
 			else if (y == grid.SizeY)
-				n[1] = grid[z, y - 1, x] - grid[z, y, x];
+				n[1] = grid[x, y - 1, z] - grid[x, y, z];
 			else
-				n[1] = 0.5f * (grid[z, y - 1, x] - grid[z, y + 1, x]);
+				n[1] = 0.5f * (grid[x, y - 1, z] - grid[x, y + 1, z]);
 			if (z == 0)
-				n[2] = grid[0, y, x] - grid[1, y, x];
+				n[2] = grid[x, y, 0] - grid[x, y, 1];
 			else if (z == grid.SizeZ)
-				n[2] = grid[z - 1, y, x] - grid[z, y, x];
+				n[2] = grid[x, y, z - 1] - grid[x, y, z];
 			else
-				n[2] = 0.5f * (grid[z - 1, y, x] - grid[z + 1, y, x]);
-			return store_point_normal(s, r, n);
+				n[2] = 0.5f * (grid[x, y, z - 1] - grid[x, y, z + 1]);
+			return store_point_normal(grid, s, r, n);
 		}
 
 		/******************************************************************
@@ -481,7 +483,7 @@ namespace MC_33
 										n[0] = (v[4] - v[0]) * (1.0f - t) + (v[5] - v[1]) * t;
 										n[1] = v[1] - v[0];
 										n[2] = (v[3] - v[0]) * (1.0f - t) + (v[2] - v[1]) * t;
-										p[0] = store_point_normal(s, r, n);
+										p[0] = store_point_normal(grid, s, r, n);
 									}
 								}
 								break;
@@ -512,11 +514,11 @@ namespace MC_33
 										r[0] = 0.0f; r[1] = y + 1;
 										r[2] = z + t;
 										n[0] = (v[5] - v[1]) * (1.0f - t) + (v[6] - v[2]) * t;
-										n[1] = (y + 1 < grid.SizeY ? 0.5f * ((grid[z, y, 0] - grid[z, y + 2, 0]) * (1.0f - t)
-													+ (grid[z + 1, y, 0] - grid[z + 1, y + 2, 0]) * t) :
+										n[1] = (y + 1 < grid.SizeY ? 0.5f * ((grid[0, y, z] - grid[0, y + 2, z]) * (1.0f - t)
+													+ (grid[0, y, z + 1] - grid[0, y + 2, z + 1]) * t) :
 													(v[1] - v[0]) * (1.0f - t) + (v[2] - v[3]) * t);
 										n[2] = v[2] - v[1];
-										_NL[0] = p[1] = store_point_normal(s, r, n);
+										_NL[0] = p[1] = store_point_normal(grid, s, r, n);
 									}
 								}
 								break;
@@ -548,10 +550,10 @@ namespace MC_33
 										r[1] = y + t;
 										n[0] = (v[7] - v[3]) * (1.0f - t) + (v[6] - v[2]) * t;
 										n[1] = v[2] - v[3];
-										n[2] = (z + 1 < grid.SizeZ ? 0.5f * ((grid[z, y, 0] - grid[z + 2, y, 0]) * (1.0f - t)
-													+ (grid[z, y + 1, 0] - grid[z + 2, y + 1, 0]) * t) :
+										n[2] = (z + 1 < grid.SizeZ ? 0.5f * ((grid[0, y, z] - grid[0, y, z + 2]) * (1.0f - t)
+													+ (grid[0, y + 1, z] - grid[0, y + 1, z + 2]) * t) :
 													(v[3] - v[0]) * (1.0f - t) + (v[2] - v[1]) * t);
-										_Ny[y, 0] = p[2] = store_point_normal(s, r, n);
+										_Ny[y, 0] = p[2] = store_point_normal(grid, s, r, n);
 									}
 								}
 								break;
@@ -580,7 +582,7 @@ namespace MC_33
 										n[0] = (v[4] - v[0]) * (1.0f - t) + (v[7] - v[3]) * t;
 										n[1] = (v[1] - v[0]) * (1.0f - t) + (v[2] - v[3]) * t;
 										n[2] = v[3] - v[0];
-										p[3] = store_point_normal(s, r, n);
+										p[3] = store_point_normal(grid, s, r, n);
 									}
 								}
 								break;
@@ -608,12 +610,12 @@ namespace MC_33
 										t = v[4] / (v[4] - v[5]);
 										r[0] = x + 1; r[2] = 0.0f;
 										r[1] = y + t;
-										n[0] = (x + 1 < grid.SizeX ? 0.5f * ((grid[0, y, x] - grid[0, y, x + 2]) * (1.0f - t)
-													+ (grid[0, y + 1, x] - grid[0, y + 1, x + 2]) * t) :
+										n[0] = (x + 1 < grid.SizeX ? 0.5f * ((grid[x, y, 0] - grid[x + 2, y, 0]) * (1.0f - t)
+													+ (grid[x, y + 1, 0] - grid[x + 2, y + 1, 0]) * t) :
 													(v[4] - v[0]) * (1.0f - t) + (v[5] - v[1]) * t);
 										n[1] = v[5] - v[4];
 										n[2] = (v[7] - v[4]) * (1.0f - t) + (v[6] - v[5]) * t;
-										_Oy[y, x + 1] = p[4] = store_point_normal(s, r, n);
+										_Oy[y, x + 1] = p[4] = store_point_normal(grid, s, r, n);
 									}
 								}
 								break;
@@ -654,14 +656,14 @@ namespace MC_33
 									t = v[5] / (v[5] - v[6]);
 									r[0] = x + 1; r[1] = y + 1;
 									r[2] = z + t;
-									n[0] = (x + 1 < grid.SizeX ? 0.5f * ((grid[z, y + 1, x] - grid[z, y + 1, x + 2]) * (1.0f - t)
-												+ (grid[z + 1, y + 1, x] - grid[z + 1, y + 1, x + 2]) * t) :
+									n[0] = (x + 1 < grid.SizeX ? 0.5f * ((grid[x, y + 1, z] - grid[x + 2, y + 1, z]) * (1.0f - t)
+												+ (grid[x, y + 1, z + 1] - grid[x + 2, y + 1, z + 1]) * t) :
 												(v[5] - v[1]) * (1.0f - t) + (v[6] - v[2]) * t);
-									n[1] = (y + 1 < grid.SizeY ? 0.5f * ((grid[z, y, x + 1] - grid[z, y + 2, x + 1]) * (1.0f - t)
-												+ (grid[z + 1, y, x + 1] - grid[z + 1, y + 2, x + 1]) * t) :
+									n[1] = (y + 1 < grid.SizeY ? 0.5f * ((grid[x + 1, y, z] - grid[x + 1, y + 2, z]) * (1.0f - t)
+												+ (grid[x + 1, y, z + 1] - grid[x + 1, y + 2, z + 1]) * t) :
 												(v[5] - v[4]) * (1.0f - t) + (v[6] - v[7]) * t);
 									n[2] = v[6] - v[5];
-									_NL[x + 1] = p[5] = store_point_normal(s, r, n);
+									_NL[x + 1] = p[5] = store_point_normal(grid, s, r, n);
 								}
 								break;
 							case 6:
@@ -701,14 +703,14 @@ namespace MC_33
 									t = v[7] / (v[7] - v[6]);
 									r[0] = x + 1; r[2] = z + 1;
 									r[1] = y + t;
-									n[0] = (x + 1 < grid.SizeX ? 0.5f * ((grid[z + 1, y, x] - grid[z + 1, y, x + 2]) * (1.0f - t)
-												+ (grid[z + 1, y + 1, x] - grid[z + 1, y + 1, x + 2]) * t) :
+									n[0] = (x + 1 < grid.SizeX ? 0.5f * ((grid[x, y, z + 1] - grid[x + 2, y, z + 1]) * (1.0f - t)
+												+ (grid[x, y + 1, z + 1] - grid[x + 2, y + 1, z + 1]) * t) :
 												(v[7] - v[3]) * (1.0f - t) + (v[6] - v[2]) * t);
 									n[1] = v[6] - v[7];
-									n[2] = (z + 1 < grid.SizeZ ? 0.5f * ((grid[z, y, x + 1] - grid[z + 2, y, x + 1]) * (1.0f - t)
-													+ (grid[z, y + 1, x + 1] - grid[z + 2, y + 1, x + 1]) * t) :
+									n[2] = (z + 1 < grid.SizeZ ? 0.5f * ((grid[x + 1, y, z] - grid[x + 1, y, z + 2]) * (1.0f - t)
+													+ (grid[x + 1, y + 1, z] - grid[x + 1, y + 1, z + 2]) * t) :
 												(v[7] - v[4]) * (1.0f - t) + (v[6] - v[5]) * t);
-									_Ny[y, x + 1] = p[6] = store_point_normal(s, r, n);
+									_Ny[y, x + 1] = p[6] = store_point_normal(grid, s, r, n);
 								}
 								break;
 							case 7:
@@ -738,12 +740,12 @@ namespace MC_33
 										t = v[4] / (v[4] - v[7]);
 										r[0] = x + 1; r[1] = 0.0f;
 										r[2] = z + t;
-										n[0] = (x + 1 < grid.SizeX ? 0.5f * ((grid[z, 0, x] - grid[z, 0, x + 2]) * (1.0f - t)
-													+ (grid[z + 1, 0, x] - grid[z + 1, 0, x + 2]) * t) :
+										n[0] = (x + 1 < grid.SizeX ? 0.5f * ((grid[x, 0, z] - grid[x + 2, 0, z]) * (1.0f - t)
+													+ (grid[x, 0, z + 1] - grid[x + 2, 0, z + 1]) * t) :
 													(v[4] - v[0]) * (1.0f - t) + (v[7] - v[3]) * t);
 										n[1] = (v[5] - v[4]) * (1.0f - t) + (v[6] - v[7]) * t;
 										n[2] = v[7] - v[4];
-										_OL[x + 1] = p[7] = store_point_normal(s, r, n);
+										_OL[x + 1] = p[7] = store_point_normal(grid, s, r, n);
 									}
 								}
 								break;
@@ -774,7 +776,7 @@ namespace MC_33
 										n[0] = v[4] - v[0];
 										n[1] = (v[1] - v[0]) * (1.0f - t) + (v[5] - v[4]) * t;
 										n[2] = (v[3] - v[0]) * (1.0f - t) + (v[7] - v[4]) * t;
-										p[8] = store_point_normal(s, r, n);
+										p[8] = store_point_normal(grid, s, r, n);
 									}
 								}
 								break;
@@ -805,11 +807,11 @@ namespace MC_33
 										r[1] = y + 1; r[2] = 0.0f;
 										r[0] = x + t;
 										n[0] = v[5] - v[1];
-										n[1] = (y + 1 < grid.SizeY ? 0.5f * ((grid[0, y, x] - grid[0, y + 2, x]) * (1.0f - t)
-													+ (grid[0, y, x + 1] - grid[0, y + 2, x + 1]) * t) :
+										n[1] = (y + 1 < grid.SizeY ? 0.5f * ((grid[x, y, 0] - grid[x, y + 2, 0]) * (1.0f - t)
+													+ (grid[x + 1, y, 0] - grid[x + 1, y + 2, 0]) * t) :
 													(v[1] - v[0]) * (1.0f - t) + (v[5] - v[4]) * t);
 										n[2] = (v[2] - v[1]) * (1.0f - t) + (v[6] - v[5]) * t;
-										_Ox[y + 1, x] = p[9] = store_point_normal(s, r, n);
+										_Ox[y + 1, x] = p[9] = store_point_normal(grid, s, r, n);
 									}
 								}
 								break;
@@ -851,13 +853,13 @@ namespace MC_33
 									r[1] = y + 1; r[2] = z + 1;
 									r[0] = x + t;
 									n[0] = v[6] - v[2];
-									n[1] = (y + 1 < grid.SizeY ? 0.5f * ((grid[z + 1, y, x] - grid[z + 1, y + 2, x]) * (1.0f - t)
-												+ (grid[z + 1, y, x + 1] - grid[z + 1, y + 2, x + 1]) * t) :
+									n[1] = (y + 1 < grid.SizeY ? 0.5f * ((grid[x, y, z + 1] - grid[x, y + 2, z + 1]) * (1.0f - t)
+												+ (grid[x + 1, y, z + 1] - grid[x + 1, y + 2, z + 1]) * t) :
 												(v[2] - v[3]) * (1.0f - t) + (v[6] - v[7]) * t);
-									n[2] = (z + 1 < grid.SizeZ ? 0.5f * ((grid[z, y + 1, x] - grid[z + 2, y + 1, x]) * (1.0f - t)
-												+ (grid[z, y + 1, x + 1] - grid[z + 2, y + 1, x + 1]) * t) :
+									n[2] = (z + 1 < grid.SizeZ ? 0.5f * ((grid[x, y + 1, z] - grid[x, y + 1, z + 2]) * (1.0f - t)
+												+ (grid[x + 1, y + 1, z] - grid[x + 1, y + 1, z + 2]) * t) :
 												(v[2] - v[1]) * (1.0f - t) + (v[6] - v[5]) * t);
-									_Nx[y + 1, x] = p[10] = store_point_normal(s, r, n);
+									_Nx[y + 1, x] = p[10] = store_point_normal(grid, s, r, n);
 								}
 								break;
 							case 11:
@@ -889,10 +891,10 @@ namespace MC_33
 										r[0] = x + t;
 										n[0] = v[7] - v[3];
 										n[1] = (v[2] - v[3]) * (1.0f - t) + (v[6] - v[7]) * t;
-										n[2] = (z + 1 < grid.SizeZ ? 0.5f * ((grid[z, 0, x] - grid[z + 2, 0, x]) * (1.0f - t)
-													+ (grid[z, 0, x + 1] - grid[z + 2, 0, x + 1]) * t) :
+										n[2] = (z + 1 < grid.SizeZ ? 0.5f * ((grid[x, 0, z] - grid[x, 0, z + 2]) * (1.0f - t)
+													+ (grid[x + 1, 0, z] - grid[x + 1, 0, z + 2]) * t) :
 													(v[3] - v[0]) * (1.0f - t) + (v[7] - v[4]) * t);
-										_Nx[0, x] = p[11] = store_point_normal(s, r, n);
+										_Nx[0, x] = p[11] = store_point_normal(grid, s, r, n);
 									}
 								}
 								break;
@@ -901,7 +903,7 @@ namespace MC_33
 								n[0] = v[4] + v[5] + v[6] + v[7] - v[0] - v[1] - v[2] - v[3];
 								n[1] = v[1] + v[2] + v[5] + v[6] - v[0] - v[3] - v[4] - v[7];
 								n[2] = v[2] + v[3] + v[6] + v[7] - v[0] - v[1] - v[4] - v[5];
-								p[12] = store_point_normal(s, r, n);
+								p[12] = store_point_normal(grid, s, r, n);
 								break;
 						}
 					}
@@ -932,7 +934,7 @@ namespace MC_33
 			int[,] _Ny = new int[ny, nx + 1];
 			int[,] _Ox = new int[ny + 1, nx];
 			int[,] _Nx = new int[ny + 1, nx];
-			Surface surface = new Surface();
+			Surface surface = new ListSurface();
 			for (z = 0; z < nz; z++)
 			{
 				//D[][] F0 = *F;
@@ -947,10 +949,10 @@ namespace MC_33
 					//v2[1] = iso - *V01;
 					//v2[2] = iso - *V11;
 					//v2[3] = iso - *V10;
-					vs[4] = iso - grid[z, y, 0];
-					vs[5] = iso - grid[z, y + 1, 0];
-					vs[6] = iso - grid[z + 1, y + 1, 0];
-					vs[7] = iso - grid[z + 1, y, 0];
+					vs[4] = iso - grid[0, y, z];
+					vs[5] = iso - grid[0, y + 1, z];
+					vs[6] = iso - grid[0, y + 1, z + 1];
+					vs[7] = iso - grid[0, y, z + 1];
 					//the eight least significant bits of i correspond to vertex indices. (x...x01234567)
 					//If the bit is 1 then the vertex value is greater than zero.
 					i = (((((SignBit(vs[4]) << 1) | SignBit(vs[5])) << 1) | SignBit(vs[6])) << 1) | SignBit(vs[7]);
@@ -965,10 +967,10 @@ namespace MC_33
 						//v2[1] = iso - *(++V01);
 						//v2[2] = iso - *(++V11);
 						//v2[3] = iso - *(++V10);
-						vs[4] = iso - grid[z, y, x + 1];
-						vs[5] = iso - grid[z, y + 1, x + 1];
-						vs[6] = iso - grid[z + 1, y + 1, x + 1];
-						vs[7] = iso - grid[z + 1, y, x + 1];
+						vs[4] = iso - grid[x + 1, y, z];
+						vs[5] = iso - grid[x + 1, y + 1, z];
+						vs[6] = iso - grid[x + 1, y + 1, z + 1];
+						vs[7] = iso - grid[x + 1, y, z + 1];
 						i = ((((((((i & 0x0F) << 1) | SignBit(vs[4])) << 1) | SignBit(vs[5])) << 1) | SignBit(vs[6])) << 1) | SignBit(vs[7]);
 						if (i != 0 && i != 0xFF)//i is different from 0 and 0xFF
 						{

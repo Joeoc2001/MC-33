@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace MC_33
 {
-
     /// <summary>
     /// The structure Grid contains a function double[,,] evaluated at a grid of regularly
     /// spaced points. 
@@ -13,52 +13,35 @@ namespace MC_33
     /// d is the distance between adjacent points in each dimension
     /// (can be different for each dimension)
     /// </summary>
-    public class Grid
+    public abstract class Grid
     {
-        private readonly float[,,] data;
-        private readonly Vector3 r0;
-        private readonly Vector3 d;
+        public Vector3 Origin { get; private set; }
+        public Vector3 Offset { get; private set; }
 
-        /// <summary>
-        /// Creates a new immutable grid of sampled points
-        /// </summary>
-        /// <param name="data">The results of a function evaluated at a grid of regularly spaced points.
-        /// Should be given in zyx format</param>
-        /// <param name="r0">The coordinates of the first grid point</param>
-        /// <param name="d">The distance between adjacent points in each dimension</param>
-        public Grid(float[,,] data, Vector3 r0, Vector3 d)
+        public Grid(Vector3 r0, Vector3 d)
         {
-            this.data = data;
-            this.r0 = r0;
-            this.d = d;
+            Origin = r0;
+            Offset = d;
         }
 
-        public float this[int z, int y, int x]
+        public abstract float this[int x, int y, int z]
         {
-            get => data[z, y, x];
+            get;
         }
 
-        public Vector3 GetPosition(int z, int y, int x)
+        public abstract int SizeX
         {
-            return r0 + (d * new Vector3(z, y, x));
+            get;
         }
 
-        public int SizeX
+        public abstract int SizeY
         {
-            get => data.GetLength(0) - 1;
-        }
-        public int SizeY
-        {
-            get => data.GetLength(1) - 1;
-        }
-        public int SizeZ
-        {
-            get => data.GetLength(2) - 1;
+            get;
         }
 
-        public Surface GenerateSurface()
+        public abstract int SizeZ
         {
-            return GenerateSurface(0);
+            get;
         }
 
         public Surface GenerateSurface(float isovalue)

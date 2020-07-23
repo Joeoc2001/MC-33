@@ -1,42 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using System.Text;
 
 namespace MC_33
 {
-    public class Surface
+    public abstract class Surface
     {
         private static readonly double EPSILON = 0.000000001; // Used for comparing vectors in equality function
 
-        private readonly List<int> triangles = new List<int>();
-		private readonly List<Vector3> vertices = new List<Vector3>();
+        public abstract int AddVertex(Vector3 pos);
 
-        public int AddVertex(Vector3 pos)
-        {
-            int c = vertices.Count;
+        public abstract void AddTriangle(int p1, int p2, int p3);
 
-            vertices.Add(pos);
+        public abstract int[] GetTriangles();
 
-            return c;
-        }
+        public abstract Vector3[] GetVertices();
 
-        public void AddTriangle(int p1, int p2, int p3)
-		{
-			triangles.Add(p1);
-			triangles.Add(p2);
-			triangles.Add(p3);
-		}
-
-		public int[] GetTriangles()
-		{
-			return triangles.ToArray();
-		}
-
-		public Vector3[] GetVertices()
-		{
-			return vertices.ToArray();
-		}
+        public abstract int GetVertexCount();
 
         public static bool AreTrianglesEqual(Vector3[] t1, Vector3[] t2)
         {

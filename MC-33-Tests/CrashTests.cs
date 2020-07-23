@@ -19,7 +19,7 @@ namespace MC_33_Tests
                 { { e, f }, { g, h } }
             };
 
-            Grid grid = new Grid(cells, Vector3.Zero, Vector3.One);
+            ArrayGrid grid = new ArrayGrid(cells, Vector3.Zero, Vector3.One);
 
             // ACT & ASSERT
             Assert.DoesNotThrow(() => grid.GenerateSurface(0));

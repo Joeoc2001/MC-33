@@ -14,12 +14,12 @@ namespace MC_33_Tests.CaseSpecificTests
         {
             // ARRANGE
             float[,,] cells = new float[,,] {
-                { {  1,  1 }, { -1,  1 } },
-                { { -1, -1 }, { -1, -1 } }
+                { {  1, -1 }, { -1, -1 } },
+                { {  1, -1 }, {  1, -1 } }
             };
 
             // Two valid surfaces
-            Surface expected1 = new Surface();
+            Surface expected1 = new ListSurface();
             expected1.AddVertex(new Vector3(0, 0.5f, 0));
             expected1.AddVertex(new Vector3(0.5f, 1, 0));
             expected1.AddVertex(new Vector3(0, 0, 0.5f));
@@ -39,12 +39,12 @@ namespace MC_33_Tests.CaseSpecificTests
         {
             // ARRANGE
             float[,,] cells = new float[,,] {
-                { { -1, -1 }, {  1, -1 } },
-                { {  1,  1 }, {  1,  1 } }
+                { { -1,  1 }, {  1,  1 } },
+                { { -1,  1 }, { -1,  1 } }
             };
 
             // Two valid surfaces
-            Surface expected1 = new Surface();
+            Surface expected1 = new ListSurface();
             expected1.AddVertex(new Vector3(0, 0.5f, 0));
             expected1.AddVertex(new Vector3(0.5f, 1, 0));
             expected1.AddVertex(new Vector3(0, 0, 0.5f));
