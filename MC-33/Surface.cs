@@ -18,6 +18,11 @@ namespace MC_33
 
         public abstract int GetVertexCount();
 
+        public int AddVertex(float x, float y, float z)
+        {
+            return AddVertex(new Vector3(x, y, z));
+        }
+
         public static bool AreTrianglesEqual(Vector3[] t1, Vector3[] t2)
         {
             // Check if they are actually triangles
@@ -99,6 +104,85 @@ namespace MC_33
         public bool IsEquivalentTo(Surface s)
         {
             return AreSurfacesEquivalent(this, s);
+        }
+
+        private class Edge
+        {
+            public readonly int v1;
+            public readonly int v2;
+
+            public Edge(int v1, int v2)
+            {
+                if (v1 < v2)
+                {
+                    this.v1 = v1;
+                    this.v2 = v2;
+                }
+                else
+                {
+                    this.v2 = v1;
+                    this.v1 = v2;
+                }
+            }
+
+            public override bool Equals(object obj)
+            {
+                return Equals(obj as Edge);
+            }
+
+            public bool Equals(Edge edge)
+            {
+                if (edge == null)
+                {
+                    return false;
+                }
+
+                return v1 == edge.v1 && v2 == edge.v2;
+            }
+
+            public override int GetHashCode()
+            {
+                return 31 * v1 ^ v2;
+            }
+        }
+
+        public bool IsClosed()
+        {
+            /**
+             * A surface is closed iff every edge is adjacent to exactly two triangles
+             */
+
+            int[] triangles = GetTriangles();
+
+            // Populate a record of all of the triangles attached to each edge
+            Dictionary<Edge, List<int>> trianglesByEdge = new Dictionary<Edge, List<int>>();
+            for (int iTriangle = 0; iTriangle < triangles.Length / 3; iTriangle++)
+            {
+                Edge[] edges = new Edge[]
+                {
+                    new Edge(triangles[iTriangle * 3 + 0], triangles[iTriangle * 3 + 1]),
+                    new Edge(triangles[iTriangle * 3 + 1], triangles[iTriangle * 3 + 2]),
+                    new Edge(triangles[iTriangle * 3 + 2], triangles[iTriangle * 3 + 0])
+                };
+                foreach (Edge edge in edges)
+                {
+                    if (!trianglesByEdge.TryGetValue(edge, out List<int> edgeTriangles))
+                    {
+                        edgeTriangles = new List<int>();
+                        trianglesByEdge.Add(edge, edgeTriangles);
+                    }
+                    edgeTriangles.Add(iTriangle);
+                }
+            }
+
+            foreach (List<int> edgeTriangles in trianglesByEdge.Values)
+            {
+                if (edgeTriangles.Count != 2) {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

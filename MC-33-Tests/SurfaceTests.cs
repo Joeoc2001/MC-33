@@ -566,5 +566,53 @@ namespace MC_33_Tests
             // ASSERT
             Assert.IsTrue(areEqual);
         }
+
+        [Test]
+        public void Surface_IsClosed_True_ForEmptySurface()
+        {
+            // ARRANGE
+            Surface s = new ListSurface();
+
+            // ACT
+            bool isClosed = s.IsClosed();
+
+            // ASSERT
+            Assert.IsTrue(isClosed);
+        }
+
+        [Test]
+        public void Surface_IsClosed_False_ForSingleTriangle()
+        {
+            // ARRANGE
+            Surface s = new ListSurface();
+            s.AddVertex(0, 0, 0);
+            s.AddVertex(0, 1, 0);
+            s.AddVertex(1, 0, 0);
+            s.AddTriangle(0, 1, 2);
+
+            // ACT
+            bool isClosed = s.IsClosed();
+
+            // ASSERT
+            Assert.IsFalse(isClosed);
+        }
+
+        [Test]
+        public void Surface_IsClosed_True_ForBackToBackTriangles()
+        {
+            // ARRANGE
+            Surface s = new ListSurface();
+            s.AddVertex(0, 0, 0);
+            s.AddVertex(0, 1, 0);
+            s.AddVertex(1, 0, 0);
+            s.AddTriangle(0, 1, 2);
+            s.AddTriangle(0, 2, 1);
+
+            // ACT
+            bool isClosed = s.IsClosed();
+
+            // ASSERT
+            Assert.IsTrue(isClosed);
+        }
     }
 }
