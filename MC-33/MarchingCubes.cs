@@ -6,9 +6,10 @@ namespace MC_33
 	internal static class MarchingCubes
 	{
 		private static int ToInt(bool b) { return b ? 1 : 0; }
+
 		private static int SignBit(float i)
 		{
-			return Math.Sign(i) < 0 ? 1 : 0;
+			return i < 0 ? 1 : 0;
 		}
 
 		/******************************************************************
@@ -28,7 +29,7 @@ namespace MC_33
 		result value is 1 if the positive face vertices are joined, -1 if the negative
 		vertices are joined, and 0 (unchanged) if the test must no be applied. The
 		return value of this function is the the sum of all six results.*/
-		static int face_tests(int[] face, int ind, int sw, float[] v)
+		static int FaceTestAll(int[] face, int ind, int sw, float[] v)
 		{
 			if ((ind & 0x80) != 0)//vertex 0
 			{
@@ -46,20 +47,20 @@ namespace MC_33
 			{
 				face[1] = ((ind & 0x66) == 0x42 ? (v[1] * v[6] < v[2] * v[5] ? -sw : sw) : 0);//0x42 = 01000010, vertices 1 and 6
 				face[2] = ((ind & 0x33) == 0x12 ? (v[3] * v[6] < v[2] * v[7] ? -sw : sw) : 0);//0x12 = 00010010, vertices 3 and 6
-				face[5] = ((ind & 0x0F) == 0x0A ? (v[4] * v[6] < v[5] * v[7] ? -sw : sw) : 0);//0x0A = 00001010, vertices 4 and 6
+				face[5] = ((ind & 0) == 0x0A ? (v[4] * v[6] < v[5] * v[7] ? -sw : sw) : 0);//0x0A = 00001010, vertices 4 and 6
 			}
 			else
 			{
 				face[1] = ((ind & 0x66) == 0x24 ? (v[1] * v[6] < v[2] * v[5] ? sw : -sw) : 0);//0x24 = 00100100, vertices 2 and 5
 				face[2] = ((ind & 0x33) == 0x21 ? (v[3] * v[6] < v[2] * v[7] ? sw : -sw) : 0);//0x21 = 00100001, vertices 2 and 7
-				face[5] = ((ind & 0x0F) == 0x05 ? (v[4] * v[6] < v[5] * v[7] ? sw : -sw) : 0);//0x05 = 00000101, vertices 5 and 7
+				face[5] = ((ind & 0) == 0x05 ? (v[4] * v[6] < v[5] * v[7] ? sw : -sw) : 0);//0x05 = 00000101, vertices 5 and 7
 			}
 			return face[0] + face[1] + face[2] + face[3] + face[4] + face[5];
 		}
 
 		/* Faster function for the face test, the test is applied to only one face
 		(int face). This function is only used for the cases 3 and 6 of MC33*/
-		static int face_test1(int face, float[] v)
+		static int FaceTestOne(int face, float[] v)
 		{
 			switch (face)
 			{
@@ -88,7 +89,7 @@ namespace MC_33
 		(case 13.5.2), returns 1 if one of the vertices 4, 5, 6 or 7 is joined to the
 		center point of the cube (case 13.5.2 too), and it returns 0 if the vertices
 		are no joined (case 13.5.1)*/
-		static int interior_test(int i, int flagtplane, float[] v)
+		static int InteriorTest(int i, int flagtplane, float[] v)
 		{
 			//Signs of cube vertices were changed to use signbit function in calc_isosurface
 			//A0 = -v[0], B0 = -v[1], C0 = -v[2], D0 = -v[3]
@@ -99,20 +100,20 @@ namespace MC_33
 			float t = At * Ct - Bt * Dt;//the "a" value.
 			if ((i & 0x01) != 0)//false for i = 0 and 2, and true for i = 1 and 3
 			{
-				if (t <= 0.0f)
+				if (t <= 0)
 				{
 					return 0;
 				}
 			}
 			else
 			{
-				if (t >= 0.0f)
+				if (t >= 0)
 				{
 					return 0;
 				}
 			}
 			t = 0.5f * (v[3] * Bt + v[1] * Dt - v[2] * At - v[0] * Ct) / t;//t = -b/2a
-			if (t <= 0.0f || t >= 1.0f)
+			if (t <= 0 || t >= 1.0f)
 			{
 				return 0;
 			}
@@ -138,29 +139,18 @@ namespace MC_33
 			return 0;
 		}
 
-		static int store_point_normal(Grid grid, Surface s, float[] r)
+		static int StorePoint(Grid grid, Surface s, float[] r)
 		{
-			return store_point_normal(grid, s, r[0], r[1], r[2]);
+			return StorePoint(grid, s, r[0], r[1], r[2]);
 		}
 
-		static int store_point_normal(Grid grid, Surface s, float x, float y, float z)
+		static int StorePoint(Grid grid, Surface s, float x, float y, float z)
 		{
 			Vector3 pos = new Vector3(x, y, z);
 			pos *= grid.Offset;
 			pos += grid.Origin;
 
 			return s.AddVertex(pos);
-		}
-
-		/******************************************************************
-		Auxiliary function that calculates the normal if a vertex
-		of the cube lies on the isosurface.
-		*/
-		static int surfint(Grid grid, Surface s, int x, int y, int z, float[] r)
-		{
-			r[0] = x; r[1] = y; r[2] = z;
-
-			return store_point_normal(grid, s, r);
 		}
 
 		/******************************************************************
@@ -178,923 +168,935 @@ namespace MC_33
 		  | 8         | 9     x
 		  |/____4_____|/
 
-		The temporary matrices: _Ox, _Oy, _Nx and _Ny, and vectors: _OL and _NL are filled
-		and used here.*/
+		*/
 
-		static void find_case(Grid grid, Surface s, int x, int y, int z, int i, float[] v,
-			int[] _OL, int[] _NL, int[,] _Oy, int[,] _Ny, int[,] _Ox, int[,] _Nx)
+		static void FindCase(Grid grid, Surface surface, int x, int y, int z, int i, float[] cell,
+			int[] oldLayer, int[] newLayer, int[,] oldY, int[,] newY, int[,] oldX, int[,] newX)
 		{
-			ushort[] pcase = new ushort[0];
+			ushort[] casePoints = new ushort[0];
 			float t;
-			float[] r = new float[3];
+			float[] point = new float[3];
 			int k;
-			int[] f = new int[6];//for the face tests
-			int[] p = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-			int m = i & 0x80;
-			int c = LookUpTable.Case_Index[m == 0 ? i : i ^ 0xFF];
-			switch (c >> 8)//find the MC33 case
+			int[] faces = new int[6];//for the face tests
+			int[] pointIndices = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+			int reverseTriangles = i & 0x80;
+			int caseCode = LookUpTable.Case_Index[reverseTriangles == 0 ? i : i ^ 0xFF];
+			switch (caseCode >> 8)//find the MC33 case
 			{
 				case 1://********************************************
-					if ((c & 0x0080) != 0)
+					if ((caseCode & 0x0080) != 0)
 					{
-						m ^= 0x80;
+						reverseTriangles ^= 0x80;
 					}
 
-					pcase = LookUpTable.Case_1[(c & 0x7F)];
+					casePoints = LookUpTable.Case_1[(caseCode & 0x7F)];
 					break;
 				case 2://********************************************
-					if ((c & 0x0080) != 0)
+					if ((caseCode & 0x0080) != 0)
 					{
-						m ^= 0x80;
+						reverseTriangles ^= 0x80;
 					}
 
-					pcase = LookUpTable.Case_2[(c & 0x7F)];
+					casePoints = LookUpTable.Case_2[(caseCode & 0x7F)];
 					break;
 				case 3://********************************************
-					if ((c & 0x0080) != 0)
+					if ((caseCode & 0x0080) != 0)
 					{
-						m ^= 0x80;
+						reverseTriangles ^= 0x80;
 					}
 
-					if (((m != 0 ? i : i ^ 0xFF) & face_test1((c & 0x7F) >> 1, v)) != 0)
+					if (((reverseTriangles != 0 ? i : i ^ 0xFF) & FaceTestOne((caseCode & 0x7F) >> 1, cell)) != 0)
 					{
-						pcase = LookUpTable.Case_3_2[(c & 0x7F)];
+						casePoints = LookUpTable.Case_3_2[(caseCode & 0x7F)];
 					}
 					else
 					{
-						pcase = LookUpTable.Case_3_1[(c & 0x7F)];
+						casePoints = LookUpTable.Case_3_1[(caseCode & 0x7F)];
 					}
 
 					break;
 				case 4://********************************************
-					if ((c & 0x0080) != 0)
+					if ((caseCode & 0x0080) != 0)
 					{
-						m ^= 0x80;
+						reverseTriangles ^= 0x80;
 					}
 
-					if (interior_test((c & 0x7F), 0, v) != 0)
+					if (InteriorTest((caseCode & 0x7F), 0, cell) != 0)
 					{
-						pcase = LookUpTable.Case_4_2[(c & 0x7F)];
+						casePoints = LookUpTable.Case_4_2[(caseCode & 0x7F)];
 					}
 					else
 					{
-						pcase = LookUpTable.Case_4_1[(c & 0x7F)];
+						casePoints = LookUpTable.Case_4_1[(caseCode & 0x7F)];
 					}
 
 					break;
 				case 5://********************************************
-					if ((c & 0x0080) != 0)
+					if ((caseCode & 0x0080) != 0)
 					{
-						m ^= 0x80;
+						reverseTriangles ^= 0x80;
 					}
 
-					pcase = LookUpTable.Case_5[(c & 0x7F)];
+					casePoints = LookUpTable.Case_5[(caseCode & 0x7F)];
 					break;
 				case 6://********************************************
-					if ((c & 0x0080) != 0)
+					if ((caseCode & 0x0080) != 0)
 					{
-						m ^= 0x80;
+						reverseTriangles ^= 0x80;
 					}
 
-					if (((m != 0 ? i : i ^ 0xFF) & face_test1((c & 0x7F) % 6, v)) != 0)
+					if (((reverseTriangles != 0 ? i : i ^ 0xFF) & FaceTestOne((caseCode & 0x7F) % 6, cell)) != 0)
 					{
-						pcase = LookUpTable.Case_6_2[(c & 0x7F)];
+						casePoints = LookUpTable.Case_6_2[(caseCode & 0x7F)];
 					}
-					else if (interior_test((c & 0x7F) / 6, 0, v) != 0)
+					else if (InteriorTest((caseCode & 0x7F) / 6, 0, cell) != 0)
 					{
-						pcase = LookUpTable.Case_6_1_2[(c & 0x7F)];
+						casePoints = LookUpTable.Case_6_1_2[(caseCode & 0x7F)];
 					}
 					else
 					{
-						pcase = LookUpTable.Case_6_1_1[(c & 0x7F)];
+						casePoints = LookUpTable.Case_6_1_1[(caseCode & 0x7F)];
 					}
 
 					break;
 				case 7://********************************************
-					if ((c & 0x0080) != 0)
+					if ((caseCode & 0x0080) != 0)
 					{
-						m ^= 0x80;
+						reverseTriangles ^= 0x80;
 					}
 
-					switch (face_tests(f, i, (m != 0 ? 1 : -1), v))
+					switch (FaceTestAll(faces, i, (reverseTriangles != 0 ? 1 : -1), cell))
 					{
 						case -3:
-							pcase = LookUpTable.Case_7_1[(c & 0x7F)];
+							casePoints = LookUpTable.Case_7_1[(caseCode & 0x7F)];
 							break;
 						case -1:
-							if (f[4] + f[5] == 1)
+							if (faces[4] + faces[5] == 1)
 							{
-								pcase = LookUpTable.Case_7_2_1[(c & 0x7F)];
+								casePoints = LookUpTable.Case_7_2_1[(caseCode & 0x7F)];
 							}
 							else
 							{
-								pcase = (f[(33825 >> ((c & 0x7F) << 1)) & 3] == 1 ? LookUpTable.Case_7_2_3 : LookUpTable.Case_7_2_2)[(c & 0x7F)];
+								casePoints = (faces[(33825 >> ((caseCode & 0x7F) << 1)) & 3] == 1 ? LookUpTable.Case_7_2_3 : LookUpTable.Case_7_2_2)[(caseCode & 0x7F)];
 							}
 
 							break;
 						case 1:
-							if (f[4] + f[5] == -1)
+							if (faces[4] + faces[5] == -1)
 							{
-								pcase = LookUpTable.Case_7_3_3[(c & 0x7F)];
+								casePoints = LookUpTable.Case_7_3_3[(caseCode & 0x7F)];
 							}
 							else
 							{
-								pcase = (f[(33825 >> ((c & 0x7F) << 1)) & 3] == 1 ? LookUpTable.Case_7_3_2 : LookUpTable.Case_7_3_1)[(c & 0x7F)];
+								casePoints = (faces[(33825 >> ((caseCode & 0x7F) << 1)) & 3] == 1 ? LookUpTable.Case_7_3_2 : LookUpTable.Case_7_3_1)[(caseCode & 0x7F)];
 							}
 
 							break;
 						case 3:
-							if (interior_test((c & 0x7F) >> 1, 0, v) != 0)
+							if (InteriorTest((caseCode & 0x7F) >> 1, 0, cell) != 0)
 							{
-								pcase = LookUpTable.Case_7_4_2[(c & 0x7F)];
+								casePoints = LookUpTable.Case_7_4_2[(caseCode & 0x7F)];
 							}
 							else
 							{
-								pcase = LookUpTable.Case_7_4_1[(c & 0x7F)];
+								casePoints = LookUpTable.Case_7_4_1[(caseCode & 0x7F)];
 							}
 
 							break;
 					}
 					break;
 				case 8://********************************************
-					pcase = LookUpTable.Case_8[(c & 0x7F)];
+					casePoints = LookUpTable.Case_8[(caseCode & 0x7F)];
 					break;
 				case 9://********************************************
-					pcase = LookUpTable.Case_9[(c & 0x7F)];
+					casePoints = LookUpTable.Case_9[(caseCode & 0x7F)];
 					break;
 				case 10://********************************************
-					switch (face_tests(f, i, (m == 0 ? -1 : 1), v))
+					switch (FaceTestAll(faces, i, (reverseTriangles == 0 ? -1 : 1), cell))
 					{
 						case -2:
-							if ((c & 0x7F) != 0 ? interior_test(0, 0, v) != 0 || interior_test((c & 0x01) == 0 ? 3 : 1, 0, v) != 0 : interior_test(0, 0, v) != 0)
+							if ((caseCode & 0x7F) != 0 ? InteriorTest(0, 0, cell) != 0 || InteriorTest((caseCode & 0x01) == 0 ? 3 : 1, 0, cell) != 0 : InteriorTest(0, 0, cell) != 0)
 							{
-								pcase = LookUpTable.Case_10_1_2_1[(c & 0x7F)];
+								casePoints = LookUpTable.Case_10_1_2_1[(caseCode & 0x7F)];
 							}
 							else
 							{
-								pcase = LookUpTable.Case_10_1_1_1[(c & 0x7F)];
+								casePoints = LookUpTable.Case_10_1_1_1[(caseCode & 0x7F)];
 							}
 
 							break;
 						case 2:
-							if ((c & 0x7F) != 0 ? interior_test(2, 0, v) != 0 || interior_test((c & 0x01) != 0 ? 3 : 1, 0, v) != 0 : interior_test(1, 0, v) != 0)
+							if ((caseCode & 0x7F) != 0 ? InteriorTest(2, 0, cell) != 0 || InteriorTest((caseCode & 0x01) != 0 ? 3 : 1, 0, cell) != 0 : InteriorTest(1, 0, cell) != 0)
 							{
-								pcase = LookUpTable.Case_10_1_2_2[(c & 0x7F)];
+								casePoints = LookUpTable.Case_10_1_2_2[(caseCode & 0x7F)];
 							}
 							else
 							{
-								pcase = LookUpTable.Case_10_1_1_2[(c & 0x7F)];
+								casePoints = LookUpTable.Case_10_1_1_2[(caseCode & 0x7F)];
 							}
 
 							break;
 						case 0:
-							pcase = (f[4 >> ((c & 0x7F) << 1)] == 1 ? LookUpTable.Case_10_2_2 : LookUpTable.Case_10_2_1)[(c & 0x7F)];
+							casePoints = (faces[4 >> ((caseCode & 0x7F) << 1)] == 1 ? LookUpTable.Case_10_2_2 : LookUpTable.Case_10_2_1)[(caseCode & 0x7F)];
 							break;
 					}
 					break;
 				case 11://********************************************
-					pcase = LookUpTable.Case_11[(c & 0x7F)];
+					casePoints = LookUpTable.Case_11[(caseCode & 0x7F)];
 					break;
 				case 12://********************************************
-					switch (face_tests(f, i, (m != 0 ? 1 : -1), v))
+					switch (FaceTestAll(faces, i, (reverseTriangles != 0 ? 1 : -1), cell))
 					{
 						case -2:
-							if (interior_test(LookUpTable._12_test_index[0, c & 0x7F], 0, v) != 0)
+							if (InteriorTest(LookUpTable._12_test_index[0, caseCode & 0x7F], 0, cell) != 0)
 							{
-								pcase = LookUpTable.Case_12_1_2_1[(c & 0x7F)];
+								casePoints = LookUpTable.Case_12_1_2_1[(caseCode & 0x7F)];
 							}
 							else
 							{
-								pcase = LookUpTable.Case_12_1_1_1[(c & 0x7F)];
+								casePoints = LookUpTable.Case_12_1_1_1[(caseCode & 0x7F)];
 							}
 
 							break;
 						case 2:
-							if (interior_test(LookUpTable._12_test_index[1, c & 0x7F], 0, v) != 0)
+							if (InteriorTest(LookUpTable._12_test_index[1, caseCode & 0x7F], 0, cell) != 0)
 							{
-								pcase = LookUpTable.Case_12_1_2_2[(c & 0x7F)];
+								casePoints = LookUpTable.Case_12_1_2_2[(caseCode & 0x7F)];
 							}
 							else
 							{
-								pcase = LookUpTable.Case_12_1_1_2[(c & 0x7F)];
+								casePoints = LookUpTable.Case_12_1_1_2[(caseCode & 0x7F)];
 							}
 
 							break;
 						case 0:
-							pcase = (f[LookUpTable._12_test_index[2, c & 0x7F]] == 1 ? LookUpTable.Case_12_2_2 : LookUpTable.Case_12_2_1)[(c & 0x7F)];
+							casePoints = (faces[LookUpTable._12_test_index[2, caseCode & 0x7F]] == 1 ? LookUpTable.Case_12_2_2 : LookUpTable.Case_12_2_1)[(caseCode & 0x7F)];
 							break;
 					}
 					break;
 				case 13://********************************************
-					c = face_tests(f, i, (m != 0 ? 1 : -1), v);
-					switch (Math.Abs(c))
+					caseCode = FaceTestAll(faces, i, (reverseTriangles != 0 ? 1 : -1), cell);
+					switch (Math.Abs(caseCode))
 					{
 						case 6:
-							pcase = LookUpTable.Case_13_1[(c > 0 ? 1 : 0)];
+							casePoints = LookUpTable.Case_13_1[(caseCode > 0 ? 1 : 0)];
 							break;
 						case 4:
-							c >>= 2;
+							caseCode >>= 2;
 							i = 0;
-							while (f[i] != -c)
+							while (faces[i] != -caseCode)
 							{
 								++i;
 							}
 
-							pcase = LookUpTable.Case_13_2[(3 * c + 3 + i)];
-							i = 1;
+							casePoints = LookUpTable.Case_13_2[(3 * caseCode + 3 + i)];
 							break;
 						case 2:
-							c = (((((((ToInt(f[0] < 0) << 1) | ToInt(f[1] < 0)) << 1) | ToInt(f[2] < 0)) << 1) |
-									ToInt(f[3] < 0)) << 1) | ToInt(f[4] < 0);
-							pcase = LookUpTable.Case_13_3[(25 - c + ((ToInt(c > 10) + ToInt(c > 20)) << 1))];
+							caseCode = (((((((ToInt(faces[0] < 0) << 1) | ToInt(faces[1] < 0)) << 1) | ToInt(faces[2] < 0)) << 1) |
+									ToInt(faces[3] < 0)) << 1) | ToInt(faces[4] < 0);
+							casePoints = LookUpTable.Case_13_3[(25 - caseCode + ((ToInt(caseCode > 10) + ToInt(caseCode > 20)) << 1))];
 							break;
 						case 0:
-							c = (ToInt(f[1] < 0) << 1) | ToInt(f[5] < 0);
-							if (f[0] * f[1] * f[5] == 1)
+							caseCode = (ToInt(faces[1] < 0) << 1) | ToInt(faces[5] < 0);
+							if (faces[0] * faces[1] * faces[5] == 1)
 							{
-								pcase = LookUpTable.Case_13_4[c];
+								casePoints = LookUpTable.Case_13_4[caseCode];
 							}
 							else
 							{
-								i = interior_test(c, 1, v);
+								i = InteriorTest(caseCode, 1, cell);
 								if (i != 0)
 								{
-									pcase = LookUpTable.Case_13_5_2[(c | ((i & 1) << 2))];
+									casePoints = LookUpTable.Case_13_5_2[(caseCode | ((i & 1) << 2))];
 								}
 								else
 								{
-									pcase = LookUpTable.Case_13_5_1[c];
-									i = 1;
+									casePoints = LookUpTable.Case_13_5_1[caseCode];
 								}
 							}
 							break;
 					}
 					break;
 				case 14:
-					pcase = LookUpTable.Case_14[(c & 0x7F)];
+					casePoints = LookUpTable.Case_14[(caseCode & 0x7F)];
 					break;
 			}
-			foreach (ushort caseItem in pcase)
+			foreach (ushort caseItem in casePoints)
 			{
 				ushort j = caseItem;
 				for (k = 0; k < 3; ++k)
 				{
-					c = j & 0x0F;
+					caseCode = j & 0;
 					j >>= 4;
-					if (p[c] < 0)
+					if (pointIndices[caseCode] < 0)
 					{
-						switch (c)//the vertices r[3] and normals n[3] are calculated here
+						switch (caseCode)//the vertices r[3] and normals n[3] are calculated here
 						{
 							case 0:
 								if (z != 0 || x != 0)
 								{
-									p[0] = _Oy[y, x];
+									pointIndices[0] = oldY[y, x];
 								}
 								else
 								{
-									if (v[0] == 0.0f)
+									if (cell[0] == 0)
 									{
-										p[0] = store_point_normal(grid, s, 0, y, 0);
-										if (SignBit(v[3]) != 0)
+										pointIndices[0] = StorePoint(grid, surface, 0, y, 0);
+										if (SignBit(cell[3]) != 0)
 										{
-											p[3] = p[0];
+											pointIndices[3] = pointIndices[0];
 										}
 
-										if (SignBit(v[4]) != 0)
+										if (SignBit(cell[4]) != 0)
 										{
-											p[8] = p[0];
+											pointIndices[8] = pointIndices[0];
 										}
 									}
-									else if (v[1] == 0.0f)
+									else if (cell[1] == 0)
 									{
-										p[0] = store_point_normal(grid, s, 0, y + 1, 0);
-										if (SignBit(v[2]) != 0)
+										pointIndices[0] = StorePoint(grid, surface, 0, y + 1, 0);
+										if (SignBit(cell[2]) != 0)
 										{
-											_NL[0] = p[1] = p[0];
+											newLayer[0] = pointIndices[1] = pointIndices[0];
 										}
 
-										if (SignBit(v[5]) != 0)
+										if (SignBit(cell[5]) != 0)
 										{
-											_Ox[y + 1, 0] = p[9] = p[0];
+											oldX[y + 1, 0] = pointIndices[9] = pointIndices[0];
 										}
 									}
 									else
 									{
-										t = v[0] / (v[0] - v[1]);
-										r[0] = r[2] = 0.0f;
-										r[1] = y + t;
-										p[0] = store_point_normal(grid, s, r);
+										t = cell[0] / (cell[0] - cell[1]);
+										point[0] = point[2] = 0;
+										point[1] = y + t;
+										pointIndices[0] = StorePoint(grid, surface, point);
 									}
 								}
 								break;
 							case 1:
 								if (x != 0)
 								{
-									p[1] = _NL[x];
+									pointIndices[1] = newLayer[x];
 								}
 								else
 								{
-									if (v[1] == 0.0f)
+									if (cell[1] == 0)
 									{
-										_NL[0] = p[1] = store_point_normal(grid, s, 0, y + 1, z);
-										if (SignBit(v[0]) != 0)
+										newLayer[0] = pointIndices[1] = StorePoint(grid, surface, 0, y + 1, z);
+										if (SignBit(cell[0]) != 0)
 										{
-											p[0] = p[1];
+											pointIndices[0] = pointIndices[1];
 										}
 
-										if (SignBit(v[5]) != 0)
+										if (SignBit(cell[5]) != 0)
 										{
-											p[9] = p[1];
+											pointIndices[9] = pointIndices[1];
 											if (z == 0)
 											{
-												_Ox[y + 1, 0] = p[9];
+												oldX[y + 1, 0] = pointIndices[9];
 											}
 										}
 									}
-									else if (v[2] == 0.0f)
+									else if (cell[2] == 0)
 									{
-										_NL[0] = p[1] = store_point_normal(grid, s, 0, y + 1, z + 1);
-										if (SignBit(v[3]) != 0)
+										newLayer[0] = pointIndices[1] = StorePoint(grid, surface, 0, y + 1, z + 1);
+										if (SignBit(cell[3]) != 0)
 										{
-											_Ny[y, 0] = p[2] = p[1];
+											newY[y, 0] = pointIndices[2] = pointIndices[1];
 										}
 
-										if (SignBit(v[6]) != 0)
+										if (SignBit(cell[6]) != 0)
 										{
-											_Nx[y + 1, 0] = p[10] = p[1];
+											newX[y + 1, 0] = pointIndices[10] = pointIndices[1];
 										}
 									}
 									else
 									{
-										t = v[1] / (v[1] - v[2]);
-										r[0] = 0.0f; r[1] = y + 1;
-										r[2] = z + t;
-										_NL[0] = p[1] = store_point_normal(grid, s, r);
+										t = cell[1] / (cell[1] - cell[2]);
+										point[0] = 0;
+										point[1] = y + 1;
+										point[2] = z + t;
+										newLayer[0] = pointIndices[1] = StorePoint(grid, surface, point);
 									}
 								}
 								break;
 							case 2:
 								if (x != 0)
 								{
-									p[2] = _Ny[y, x];
+									pointIndices[2] = newY[y, x];
 								}
 								else
 								{
-									if (v[3] == 0.0f)
+									if (cell[3] == 0)
 									{
-										_Ny[y, 0] = p[2] = store_point_normal(grid, s, 0, y, z + 1);
-										if (SignBit(v[0]) != 0)
+										newY[y, 0] = pointIndices[2] = StorePoint(grid, surface, 0, y, z + 1);
+										if (SignBit(cell[0]) != 0)
 										{
-											p[3] = p[2];
+											pointIndices[3] = pointIndices[2];
 										}
 
-										if (SignBit(v[7]) != 0)
+										if (SignBit(cell[7]) != 0)
 										{
-											p[11] = p[2];
+											pointIndices[11] = pointIndices[2];
 											if (y == 0)
 											{
-												_Nx[0, 0] = p[11];
+												newX[0, 0] = pointIndices[11];
 											}
 										}
 									}
-									else if (v[2] == 0.0f)
+									else if (cell[2] == 0)
 									{
-										_Ny[y, 0] = p[2] = store_point_normal(grid, s, 0, y + 1, z + 1);
-										if (SignBit(v[1]) != 0)
+										newY[y, 0] = pointIndices[2] = StorePoint(grid, surface, 0, y + 1, z + 1);
+										if (SignBit(cell[1]) != 0)
 										{
-											_NL[0] = p[1] = p[2];
+											newLayer[0] = pointIndices[1] = pointIndices[2];
 										}
 
-										if (SignBit(v[6]) != 0)
+										if (SignBit(cell[6]) != 0)
 										{
-											_Nx[y + 1, 0] = p[10] = p[2];
+											newX[y + 1, 0] = pointIndices[10] = pointIndices[2];
 										}
 									}
 									else
 									{
-										t = v[3] / (v[3] - v[2]);
-										r[0] = 0.0f; r[2] = z + 1;
-										r[1] = y + t;
-										_Ny[y, 0] = p[2] = store_point_normal(grid, s, r);
+										t = cell[3] / (cell[3] - cell[2]);
+										point[0] = 0;
+										point[2] = z + 1;
+										point[1] = y + t;
+										newY[y, 0] = pointIndices[2] = StorePoint(grid, surface, point);
 									}
 								}
 								break;
 							case 3:
 								if (y != 0 || x != 0)
 								{
-									p[3] = _OL[x];
+									pointIndices[3] = oldLayer[x];
 								}
 								else
 								{
-									if (v[0] == 0.0f)
+									if (cell[0] == 0)
 									{
-										p[3] = store_point_normal(grid, s, 0, 0, z);
-										if (SignBit(v[1]) != 0)
+										pointIndices[3] = StorePoint(grid, surface, 0, 0, z);
+										if (SignBit(cell[1]) != 0)
 										{
-											p[0] = p[3];
+											pointIndices[0] = pointIndices[3];
 										}
 
-										if (SignBit(v[4]) != 0)
+										if (SignBit(cell[4]) != 0)
 										{
-											p[8] = p[3];
+											pointIndices[8] = pointIndices[3];
 										}
 									}
-									else if (v[3] == 0.0f)
+									else if (cell[3] == 0)
 									{
-										p[3] = store_point_normal(grid, s, 0, 0, z + 1);
-										if (SignBit(v[2]) != 0)
+										pointIndices[3] = StorePoint(grid, surface, 0, 0, z + 1);
+										if (SignBit(cell[2]) != 0)
 										{
-											_Ny[0, 0] = p[2] = p[3];
+											newY[0, 0] = pointIndices[2] = pointIndices[3];
 										}
 
-										if (SignBit(v[7]) != 0)
+										if (SignBit(cell[7]) != 0)
 										{
-											_Nx[0, 0] = p[11] = p[3];
+											newX[0, 0] = pointIndices[11] = pointIndices[3];
 										}
 									}
 									else
 									{
-										t = v[0] / (v[0] - v[3]);
-										r[0] = r[1] = 0.0f;
-										r[2] = z + t;
-										p[3] = store_point_normal(grid, s, r);
+										t = cell[0] / (cell[0] - cell[3]);
+										point[0] = point[1] = 0;
+										point[2] = z + t;
+										pointIndices[3] = StorePoint(grid, surface, point);
 									}
 								}
 								break;
 							case 4:
 								if (z != 0)
 								{
-									p[4] = _Oy[y, x + 1];
+									pointIndices[4] = oldY[y, x + 1];
 								}
 								else
 								{
-									if (v[4] == 0.0f)
+									if (cell[4] == 0)
 									{
-										_Oy[y, x + 1] = p[4] = store_point_normal(grid, s, x + 1, y, 0);
-										if (SignBit(v[7]) != 0)
+										oldY[y, x + 1] = pointIndices[4] = StorePoint(grid, surface, x + 1, y, 0);
+										if (SignBit(cell[7]) != 0)
 										{
-											p[7] = p[4];
+											pointIndices[7] = pointIndices[4];
 										}
 
-										if (SignBit(v[0]) != 0)
+										if (SignBit(cell[0]) != 0)
 										{
-											p[8] = p[4];
+											pointIndices[8] = pointIndices[4];
 										}
 
 										if (y == 0)
 										{
-											_OL[x + 1] = p[7];
+											oldLayer[x + 1] = pointIndices[7];
 										}
 									}
-									else if (v[5] == 0.0f)
+									else if (cell[5] == 0)
 									{
-										_Oy[y, x + 1] = p[4] = store_point_normal(grid, s, x + 1, y + 1, 0);
-										if (SignBit(v[6]) != 0)
+										oldY[y, x + 1] = pointIndices[4] = StorePoint(grid, surface, x + 1, y + 1, 0);
+										if (SignBit(cell[6]) != 0)
 										{
-											_NL[x + 1] = p[5] = p[4];
+											newLayer[x + 1] = pointIndices[5] = pointIndices[4];
 										}
 
-										if (SignBit(v[1]) != 0)
+										if (SignBit(cell[1]) != 0)
 										{
-											_Ox[y + 1, x] = p[9] = p[4];
+											oldX[y + 1, x] = pointIndices[9] = pointIndices[4];
 										}
 									}
 									else
 									{
-										t = v[4] / (v[4] - v[5]);
-										r[0] = x + 1; r[2] = 0.0f;
-										r[1] = y + t;
-										_Oy[y, x + 1] = p[4] = store_point_normal(grid, s, r);
+										t = cell[4] / (cell[4] - cell[5]);
+										point[0] = x + 1;
+										point[2] = 0;
+										point[1] = y + t;
+										oldY[y, x + 1] = pointIndices[4] = StorePoint(grid, surface, point);
 									}
 								}
 								break;
 							case 5:
-								if (v[5] == 0.0f)
+								if (cell[5] == 0)
 								{
-									if (SignBit(v[4]) != 0)
+									if (SignBit(cell[4]) != 0)
 									{
 										if (z != 0)
 										{
-											_NL[x + 1] = p[5] = p[4] = _Oy[y, x + 1];
-											if (SignBit(v[1]) != 0)
+											newLayer[x + 1] = pointIndices[5] = pointIndices[4] = oldY[y, x + 1];
+											if (SignBit(cell[1]) != 0)
 											{
-												p[9] = p[5];
+												pointIndices[9] = pointIndices[5];
 											}
 										}
 										else
 										{
-											_NL[x + 1] = p[5] = _Oy[y, x + 1] = p[4] = store_point_normal(grid, s, x + 1, y + 1, 0);
-											if (SignBit(v[1]) != 0)
+											newLayer[x + 1] = pointIndices[5] = oldY[y, x + 1] = pointIndices[4] = StorePoint(grid, surface, x + 1, y + 1, 0);
+											if (SignBit(cell[1]) != 0)
 											{
-												_Ox[y + 1, x] = p[9] = p[5];
+												oldX[y + 1, x] = pointIndices[9] = pointIndices[5];
 											}
 										}
 									}
-									else if (SignBit(v[1]) != 0)
+									else if (SignBit(cell[1]) != 0)
 									{
 										if (z != 0)
 										{
-											_NL[x + 1] = p[5] = p[9] = _Ox[y + 1, x];
+											newLayer[x + 1] = pointIndices[5] = pointIndices[9] = oldX[y + 1, x];
 										}
 										else
 										{
-											_NL[x + 1] = p[5] = _Ox[y + 1, x] = p[9] = store_point_normal(grid, s, x + 1, y + 1, 0);
+											newLayer[x + 1] = pointIndices[5] = oldX[y + 1, x] = pointIndices[9] = StorePoint(grid, surface, x + 1, y + 1, 0);
 										}
 									}
 									else
 									{
-										_NL[x + 1] = p[5] = store_point_normal(grid, s, x + 1, y + 1, z);
+										newLayer[x + 1] = pointIndices[5] = StorePoint(grid, surface, x + 1, y + 1, z);
 									}
 								}
-								else if (v[6] == 0.0f)
+								else if (cell[6] == 0)
 								{
-									_NL[x + 1] = p[5] = store_point_normal(grid, s, x + 1, y + 1, z + 1);
-									if (SignBit(v[2]) != 0)
+									newLayer[x + 1] = pointIndices[5] = StorePoint(grid, surface, x + 1, y + 1, z + 1);
+									if (SignBit(cell[2]) != 0)
 									{
-										_Nx[y + 1, x] = p[10] = p[5];
+										newX[y + 1, x] = pointIndices[10] = pointIndices[5];
 									}
 
-									if (SignBit(v[7]) != 0)
+									if (SignBit(cell[7]) != 0)
 									{
-										_Ny[y, x + 1] = p[6] = p[5];
+										newY[y, x + 1] = pointIndices[6] = pointIndices[5];
 									}
 								}
 								else
 								{
-									t = v[5] / (v[5] - v[6]);
-									r[0] = x + 1; r[1] = y + 1;
-									r[2] = z + t;
-									_NL[x + 1] = p[5] = store_point_normal(grid, s, r);
+									t = cell[5] / (cell[5] - cell[6]);
+									point[0] = x + 1;
+									point[1] = y + 1;
+									point[2] = z + t;
+									newLayer[x + 1] = pointIndices[5] = StorePoint(grid, surface, point);
 								}
 								break;
 							case 6:
-								if (v[7] == 0.0f)
+								if (cell[7] == 0)
 								{
-									if (SignBit(v[3]) != 0)
+									if (SignBit(cell[3]) != 0)
 									{
 										if (y != 0)
 										{
-											_Ny[y, x + 1] = p[6] = p[11] = _Nx[y, x];
-											if (SignBit(v[4]) != 0)
+											newY[y, x + 1] = pointIndices[6] = pointIndices[11] = newX[y, x];
+											if (SignBit(cell[4]) != 0)
 											{
-												p[7] = p[6];
+												pointIndices[7] = pointIndices[6];
 											}
 										}
 										else
 										{
-											_Ny[y, x + 1] = p[6] = _Nx[0, x] = p[11] = store_point_normal(grid, s, x + 1, 0, z + 1);
-											if (SignBit(v[4]) != 0)
+											newY[y, x + 1] = pointIndices[6] = newX[0, x] = pointIndices[11] = StorePoint(grid, surface, x + 1, 0, z + 1);
+											if (SignBit(cell[4]) != 0)
 											{
-												_OL[x + 1] = p[7] = p[6];
+												oldLayer[x + 1] = pointIndices[7] = pointIndices[6];
 											}
 										}
 									}
-									else if (SignBit(v[4]) != 0)
+									else if (SignBit(cell[4]) != 0)
 									{
 										if (y != 0)
 										{
-											_Ny[y, x + 1] = p[6] = p[7] = _OL[x + 1];
+											newY[y, x + 1] = pointIndices[6] = pointIndices[7] = oldLayer[x + 1];
 										}
 										else
 										{
-											_Ny[y, x + 1] = p[6] = _OL[x + 1] = p[7] = store_point_normal(grid, s, x + 1, 0, z + 1);
+											newY[y, x + 1] = pointIndices[6] = oldLayer[x + 1] = pointIndices[7] = StorePoint(grid, surface, x + 1, 0, z + 1);
 										}
 									}
 									else
 									{
-										_Ny[y, x + 1] = p[6] = store_point_normal(grid, s, x + 1, y, z + 1);
+										newY[y, x + 1] = pointIndices[6] = StorePoint(grid, surface, x + 1, y, z + 1);
 									}
 								}
-								else if (v[6] == 0.0f)
+								else if (cell[6] == 0)
 								{
-									_Ny[y, x + 1] = p[6] = store_point_normal(grid, s, x + 1, y + 1, z + 1);
-									if (SignBit(v[5]) != 0)
+									newY[y, x + 1] = pointIndices[6] = StorePoint(grid, surface, x + 1, y + 1, z + 1);
+									if (SignBit(cell[5]) != 0)
 									{
-										_NL[x + 1] = p[5] = p[6];
+										newLayer[x + 1] = pointIndices[5] = pointIndices[6];
 									}
 
-									if (SignBit(v[2]) != 0)
+									if (SignBit(cell[2]) != 0)
 									{
-										_Nx[y + 1, x] = p[10] = p[6];
+										newX[y + 1, x] = pointIndices[10] = pointIndices[6];
 									}
 								}
 								else
 								{
-									t = v[7] / (v[7] - v[6]);
-									r[0] = x + 1; r[2] = z + 1;
-									r[1] = y + t;
-									_Ny[y, x + 1] = p[6] = store_point_normal(grid, s, r);
+									t = cell[7] / (cell[7] - cell[6]);
+									point[0] = x + 1;
+									point[2] = z + 1;
+									point[1] = y + t;
+									newY[y, x + 1] = pointIndices[6] = StorePoint(grid, surface, point);
 								}
 								break;
 							case 7:
 								if (y != 0)
 								{
-									p[7] = _OL[x + 1];
+									pointIndices[7] = oldLayer[x + 1];
 								}
 								else
 								{
-									if (v[4] == 0.0f)
+									if (cell[4] == 0)
 									{
-										_OL[x + 1] = p[7] = store_point_normal(grid, s, x + 1, 0, z);
-										if (SignBit(v[0]) != 0)
+										oldLayer[x + 1] = pointIndices[7] = StorePoint(grid, surface, x + 1, 0, z);
+										if (SignBit(cell[0]) != 0)
 										{
-											p[8] = p[7];
+											pointIndices[8] = pointIndices[7];
 										}
 
-										if (SignBit(v[5]) != 0)
+										if (SignBit(cell[5]) != 0)
 										{
-											p[4] = p[7];
+											pointIndices[4] = pointIndices[7];
 											if (z == 0)
 											{
-												_Oy[0, x + 1] = p[4];
+												oldY[0, x + 1] = pointIndices[4];
 											}
 										}
 									}
-									else if (v[7] == 0.0f)
+									else if (cell[7] == 0)
 									{
-										_OL[x + 1] = p[7] = store_point_normal(grid, s, x + 1, 0, z + 1);
-										if (SignBit(v[6]) != 0)
+										oldLayer[x + 1] = pointIndices[7] = StorePoint(grid, surface, x + 1, 0, z + 1);
+										if (SignBit(cell[6]) != 0)
 										{
-											_Ny[0, x + 1] = p[6] = p[7];
+											newY[0, x + 1] = pointIndices[6] = pointIndices[7];
 										}
 
-										if (SignBit(v[3]) != 0)
+										if (SignBit(cell[3]) != 0)
 										{
-											_Nx[0, x] = p[11] = p[7];
+											newX[0, x] = pointIndices[11] = pointIndices[7];
 										}
 									}
 									else
 									{
-										t = v[4] / (v[4] - v[7]);
-										r[0] = x + 1; r[1] = 0.0f;
-										r[2] = z + t;
-										_OL[x + 1] = p[7] = store_point_normal(grid, s, r);
+										t = cell[4] / (cell[4] - cell[7]);
+										point[0] = x + 1;
+										point[1] = 0;
+										point[2] = z + t;
+										oldLayer[x + 1] = pointIndices[7] = StorePoint(grid, surface, point);
 									}
 								}
 								break;
 							case 8:
 								if (z != 0 || y != 0)
 								{
-									p[8] = _Ox[y, x];
+									pointIndices[8] = oldX[y, x];
 								}
 								else
 								{
-									if (v[0] == 0.0f)
+									if (cell[0] == 0)
 									{
-										p[8] = store_point_normal(grid, s, x, 0, 0);
-										if (SignBit(v[1]) != 0)
+										pointIndices[8] = StorePoint(grid, surface, x, 0, 0);
+										if (SignBit(cell[1]) != 0)
 										{
-											p[0] = p[8];
+											pointIndices[0] = pointIndices[8];
 										}
 
-										if (SignBit(v[3]) != 0)
+										if (SignBit(cell[3]) != 0)
 										{
-											p[3] = p[8];
+											pointIndices[3] = pointIndices[8];
 										}
 									}
-									else if (v[4] == 0.0f)
+									else if (cell[4] == 0)
 									{
-										p[8] = store_point_normal(grid, s, x + 1, 0, 0);
-										if (SignBit(v[5]) != 0)
+										pointIndices[8] = StorePoint(grid, surface, x + 1, 0, 0);
+										if (SignBit(cell[5]) != 0)
 										{
-											_Oy[0, x + 1] = p[4] = p[8];
+											oldY[0, x + 1] = pointIndices[4] = pointIndices[8];
 										}
 
-										if (SignBit(v[7]) != 0)
+										if (SignBit(cell[7]) != 0)
 										{
-											_OL[x + 1] = p[7] = p[8];
+											oldLayer[x + 1] = pointIndices[7] = pointIndices[8];
 										}
 									}
 									else
 									{
-										t = v[0] / (v[0] - v[4]);
-										r[1] = r[2] = 0.0f;
-										r[0] = x + t;
-										p[8] = store_point_normal(grid, s, r);
+										t = cell[0] / (cell[0] - cell[4]);
+										point[1] = point[2] = 0;
+										point[0] = x + t;
+										pointIndices[8] = StorePoint(grid, surface, point);
 									}
 								}
 								break;
 							case 9:
 								if (z != 0)
 								{
-									p[9] = _Ox[y + 1, x];
+									pointIndices[9] = oldX[y + 1, x];
 								}
 								else
 								{
-									if (v[1] == 0.0f)
+									if (cell[1] == 0)
 									{
-										_Ox[y + 1, x] = p[9] = store_point_normal(grid, s, x, y + 1, 0);
-										if (SignBit(v[2]) != 0)
+										oldX[y + 1, x] = pointIndices[9] = StorePoint(grid, surface, x, y + 1, 0);
+										if (SignBit(cell[2]) != 0)
 										{
-											p[1] = p[9];
+											pointIndices[1] = pointIndices[9];
 											if (x == 0)
 											{
-												_NL[0] = p[1];
+												newLayer[0] = pointIndices[1];
 											}
 										}
-										if (SignBit(v[0]) != 0)
+										if (SignBit(cell[0]) != 0)
 										{
-											p[0] = p[9];
+											pointIndices[0] = pointIndices[9];
 										}
 									}
-									else if (v[5] == 0.0f)
+									else if (cell[5] == 0)
 									{
-										_Ox[y + 1, x] = p[9] = store_point_normal(grid, s, x + 1, y + 1, 0);
-										if (SignBit(v[6]) != 0)
+										oldX[y + 1, x] = pointIndices[9] = StorePoint(grid, surface, x + 1, y + 1, 0);
+										if (SignBit(cell[6]) != 0)
 										{
-											_NL[x + 1] = p[5] = p[9];
+											newLayer[x + 1] = pointIndices[5] = pointIndices[9];
 										}
 
-										if (SignBit(v[4]) != 0)
+										if (SignBit(cell[4]) != 0)
 										{
-											_Oy[y, x + 1] = p[4] = p[9];
+											oldY[y, x + 1] = pointIndices[4] = pointIndices[9];
 										}
 									}
 									else
 									{
-										t = v[1] / (v[1] - v[5]);
-										r[1] = y + 1; r[2] = 0.0f;
-										r[0] = x + t;
-										_Ox[y + 1, x] = p[9] = store_point_normal(grid, s, r);
+										t = cell[1] / (cell[1] - cell[5]);
+										point[1] = y + 1;
+										point[2] = 0;
+										point[0] = x + t;
+										oldX[y + 1, x] = pointIndices[9] = StorePoint(grid, surface, point);
 									}
 								}
 								break;
 							case 10:
-								if (v[2] == 0.0f)
+								if (cell[2] == 0)
 								{
-									if (SignBit(v[1]) != 0)
+									if (SignBit(cell[1]) != 0)
 									{
 										if (x != 0)
 										{
-											_Nx[y + 1, x] = p[10] = p[1] = _NL[x];
-											if (SignBit(v[3]) != 0)
+											newX[y + 1, x] = pointIndices[10] = pointIndices[1] = newLayer[x];
+											if (SignBit(cell[3]) != 0)
 											{
-												p[2] = p[10];
+												pointIndices[2] = pointIndices[10];
 											}
 										}
 										else
 										{
-											_Nx[y + 1, 0] = p[10] = _NL[0] = p[1] = store_point_normal(grid, s, 0, y + 1, z + 1);
-											if (SignBit(v[3]) != 0)
+											newX[y + 1, 0] = pointIndices[10] = newLayer[0] = pointIndices[1] = StorePoint(grid, surface, 0, y + 1, z + 1);
+											if (SignBit(cell[3]) != 0)
 											{
-												_Ny[y, 0] = p[2] = p[10];
+												newY[y, 0] = pointIndices[2] = pointIndices[10];
 											}
 										}
 									}
-									else if (SignBit(v[3]) != 0)
+									else if (SignBit(cell[3]) != 0)
 									{
 										if (x != 0)
 										{
-											_Nx[y + 1, x] = p[10] = p[2] = _Ny[y, x];
+											newX[y + 1, x] = pointIndices[10] = pointIndices[2] = newY[y, x];
 										}
 										else
 										{
-											_Nx[y + 1, 0] = p[10] = _Ny[y, 0] = p[2] = store_point_normal(grid, s, 0, y + 1, z + 1);
+											newX[y + 1, 0] = pointIndices[10] = newY[y, 0] = pointIndices[2] = StorePoint(grid, surface, 0, y + 1, z + 1);
 										}
 									}
 									else
 									{
-										_Nx[y + 1, x] = p[10] = store_point_normal(grid, s, x, y + 1, z + 1);
+										newX[y + 1, x] = pointIndices[10] = StorePoint(grid, surface, x, y + 1, z + 1);
 									}
 								}
-								else if (v[6] == 0.0f)
+								else if (cell[6] == 0)
 								{
-									_Nx[y + 1, x] = p[10] = store_point_normal(grid, s, x + 1, y + 1, z + 1);
-									if (SignBit(v[5]) != 0)
+									newX[y + 1, x] = pointIndices[10] = StorePoint(grid, surface, x + 1, y + 1, z + 1);
+									if (SignBit(cell[5]) != 0)
 									{
-										_NL[x + 1] = p[5] = p[10];
+										newLayer[x + 1] = pointIndices[5] = pointIndices[10];
 									}
 
-									if (SignBit(v[7]) != 0)
+									if (SignBit(cell[7]) != 0)
 									{
-										_Ny[y, x + 1] = p[6] = p[10];
+										newY[y, x + 1] = pointIndices[6] = pointIndices[10];
 									}
 								}
 								else
 								{
-									t = v[2] / (v[2] - v[6]);
-									r[1] = y + 1; r[2] = z + 1;
-									r[0] = x + t;
-									_Nx[y + 1, x] = p[10] = store_point_normal(grid, s, r);
+									t = cell[2] / (cell[2] - cell[6]);
+									point[1] = y + 1;
+									point[2] = z + 1;
+									point[0] = x + t;
+									newX[y + 1, x] = pointIndices[10] = StorePoint(grid, surface, point);
 								}
 								break;
 							case 11:
 								if (y != 0)
 								{
-									p[11] = _Nx[y, x];
+									pointIndices[11] = newX[y, x];
 								}
 								else
 								{
-									if (v[3] == 0.0f)
+									if (cell[3] == 0)
 									{
-										_Nx[0, x] = p[11] = store_point_normal(grid, s, x, 0, z + 1);
-										if (SignBit(v[0]) != 0)
+										newX[0, x] = pointIndices[11] = StorePoint(grid, surface, x, 0, z + 1);
+										if (SignBit(cell[0]) != 0)
 										{
-											p[3] = p[11];
+											pointIndices[3] = pointIndices[11];
 										}
 
-										if (SignBit(v[2]) != 0)
+										if (SignBit(cell[2]) != 0)
 										{
-											p[2] = p[11];
+											pointIndices[2] = pointIndices[11];
 											if (x == 0)
 											{
-												_Ny[0, 0] = p[2];
+												newY[0, 0] = pointIndices[2];
 											}
 										}
 									}
-									else if (v[7] == 0.0f)
+									else if (cell[7] == 0)
 									{
-										_Nx[0, x] = p[11] = store_point_normal(grid, s, x + 1, 0, z + 1);
-										if (SignBit(v[4]) != 0)
+										newX[0, x] = pointIndices[11] = StorePoint(grid, surface, x + 1, 0, z + 1);
+										if (SignBit(cell[4]) != 0)
 										{
-											_OL[x + 1] = p[7] = p[11];
+											oldLayer[x + 1] = pointIndices[7] = pointIndices[11];
 										}
 
-										if (SignBit(v[6]) != 0)
+										if (SignBit(cell[6]) != 0)
 										{
-											_Ny[0, x + 1] = p[6] = p[11];
+											newY[0, x + 1] = pointIndices[6] = pointIndices[11];
 										}
 									}
 									else
 									{
-										t = v[3] / (v[3] - v[7]);
-										r[1] = 0.0f; r[2] = z + 1;
-										r[0] = x + t;
-										_Nx[0, x] = p[11] = store_point_normal(grid, s, r);
+										t = cell[3] / (cell[3] - cell[7]);
+										point[1] = 0;
+										point[2] = z + 1;
+										point[0] = x + t;
+										newX[0, x] = pointIndices[11] = StorePoint(grid, surface, point);
 									}
 								}
 								break;
 							case 12:
-								r[0] = x + 0.5f; r[1] = y + 0.5f; r[2] = z + 0.5f;
-								p[12] = store_point_normal(grid, s, r);
+								point[0] = x + 0.5f;
+								point[1] = y + 0.5f;
+								point[2] = z + 0.5f;
+								pointIndices[12] = StorePoint(grid, surface, point);
 								break;
 						}
 					}
-					f[k] = p[c];//now f contains the vertex indices of the triangle
+					faces[k] = pointIndices[caseCode];//now f contains the vertex indices of the triangle
 				}
-				if (f[0] != f[1] && f[0] != f[2] && f[1] != f[2])//to avoid zero area triangles
+				if (faces[0] != faces[1] && faces[0] != faces[2] && faces[1] != faces[2])//to avoid zero area triangles
 				{
-					if (m != 0)//The order of triangle vertices is reversed if m is not zero
-					{ f[2] = f[0]; f[0] = p[c]; }
-					s.AddTriangle(f[0], f[1], f[2]);
+					if (reverseTriangles != 0)//The order of triangle vertices is reversed if m is not zero
+					{
+						faces[2] = faces[0]; 
+						faces[0] = pointIndices[caseCode];
+					}
+					surface.AddTriangle(faces[0], faces[1], faces[2]);
 				}
 			}
 		}
 
-		public static Surface calc_isosurface(Grid grid, float iso)
+		private static int GetLayerIntoVertices(ref float[] vertices, float iso, Grid grid, int x, int y, int z, int oldI)
 		{
-			int x, y, z;
+			vertices[0] = vertices[4];
+			vertices[1] = vertices[5];
+			vertices[2] = vertices[6];
+			vertices[3] = vertices[7];
+
+			vertices[4] = iso - grid[x, y, z];
+			vertices[5] = iso - grid[x, y + 1, z];
+			vertices[6] = iso - grid[x, y + 1, z + 1];
+			vertices[7] = iso - grid[x, y, z + 1];
+
+			return ((((((((oldI & 0) << 1) | SignBit(vertices[4])) << 1) | SignBit(vertices[5])) << 1) | SignBit(vertices[6])) << 1) | SignBit(vertices[7]);
+		}
+
+		public static Surface CalculateSurface(Grid grid, float iso)
+		{
 			int nx = grid.SizeX;
 			int ny = grid.SizeY;
 			int nz = grid.SizeZ;
-			float[] vs = new float[8];
-			int[] _OL = new int[nx + 1];
-			int[] _NL = new int[nx + 1];
-			int[,] _Oy = new int[ny, nx + 1];
-			int[,] _Ny = new int[ny, nx + 1];
-			int[,] _Ox = new int[ny + 1, nx];
-			int[,] _Nx = new int[ny + 1, nx];
+			float[] vertices = new float[8];
+			int[] oldLayer = new int[nx + 1];
+			int[] newLayer = new int[nx + 1];
+			int[,] oldY = new int[ny, nx + 1];
+			int[,] newY = new int[ny, nx + 1];
+			int[,] oldX = new int[ny + 1, nx];
+			int[,] newX = new int[ny + 1, nx];
 			Surface surface = new ListSurface();
-			for (z = 0; z < nz; z++)
+			for (int z = 0; z < nz; z++)
 			{
-				for (y = 0; y < ny; y++)
+				for (int y = 0; y < ny; y++)
 				{
-					vs[4] = iso - grid[0, y, z];
-					vs[5] = iso - grid[0, y + 1, z];
-					vs[6] = iso - grid[0, y + 1, z + 1];
-					vs[7] = iso - grid[0, y, z + 1];
 					//the eight least significant bits of i correspond to vertex indices. (x...x01234567)
 					//If the bit is 1 then the vertex value is greater than zero.
-					int i = (((((SignBit(vs[4]) << 1) | SignBit(vs[5])) << 1) | SignBit(vs[6])) << 1) | SignBit(vs[7]);
-					for (x = 0; x < nx; x++)
+					int i = GetLayerIntoVertices(ref vertices, iso, grid, 0, y, z, 0);
+					for (int x = 0; x < nx; x++)
 					{
-						vs[0] = vs[4];
-						vs[1] = vs[5];
-						vs[2] = vs[6];
-						vs[3] = vs[7];
-
-						vs[4] = iso - grid[x + 1, y, z];
-						vs[5] = iso - grid[x + 1, y + 1, z];
-						vs[6] = iso - grid[x + 1, y + 1, z + 1];
-						vs[7] = iso - grid[x + 1, y, z + 1];
-						i = ((((((((i & 0x0F) << 1) | SignBit(vs[4])) << 1) | SignBit(vs[5])) << 1) | SignBit(vs[6])) << 1) | SignBit(vs[7]);
+						i = GetLayerIntoVertices(ref vertices, iso, grid, x + 1, y, z, i);
 						if (i != 0 && i != 0xFF)//i is different from 0 and 0xFF
 						{
-							find_case(grid, surface, x, y, z, i, vs, _OL, _NL, _Oy, _Ny, _Ox, _Nx);
+							FindCase(grid, surface, x, y, z, i, vertices, oldLayer, newLayer, oldY, newY, oldX, newX);
 						}
 					}
 
-					int[] _Ltmp = _OL;
-					_OL = _NL;
-					_NL = _Ltmp;
+					int[] _Ltmp = oldLayer;
+					oldLayer = newLayer;
+					newLayer = _Ltmp;
 				}
-				int[,] _tmp = _Ox;
-				_Ox = _Nx;
-				_Nx = _tmp;
+				int[,] _tmp = oldX;
+				oldX = newX;
+				newX = _tmp;
 
-				_tmp = _Oy;
-				_Oy = _Ny;
-				_Ny = _tmp;
+				_tmp = oldY;
+				oldY = newY;
+				newY = _tmp;
 			}
 			return surface;
 		}

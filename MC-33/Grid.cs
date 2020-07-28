@@ -46,7 +46,7 @@ namespace MC_33
 
         public Surface GenerateSurface(float isovalue)
         {
-            return MarchingCubes.calc_isosurface(this, isovalue);
+            return MarchingCubes.CalculateSurface(this, isovalue);
         }
     }
 }
