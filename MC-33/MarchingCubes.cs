@@ -29,8 +29,9 @@ namespace MC_33
 		result value is 1 if the positive face vertices are joined, -1 if the negative
 		vertices are joined, and 0 (unchanged) if the test must no be applied. The
 		return value of this function is the the sum of all six results.*/
-		static int FaceTestAll(int[] face, int ind, int sw, float[] v)
+		static int FaceTestAll(out int[] face, int ind, int sw, float[] v)
 		{
+			face = new int[6];
 			if ((ind & 0x80) != 0)//vertex 0
 			{
 				face[0] = ((ind & 0xCC) == 0x84 ? (v[0] * v[5] < v[1] * v[4] ? -sw : sw) : 0);//0x84 = 10000100, vertices 0 and 5
@@ -154,6 +155,194 @@ namespace MC_33
 			return s.AddVertex(pos);
 		}
 
+		static ushort[] GetCasePoints(int i, float[] cell, int mc33Case, int subCase, int lowestCaseBit, bool reverseTriangles)
+		{
+			switch (mc33Case)//find the MC33 case
+			{
+				case 1://********************************************
+					return LookUpTable.Case_1[subCase];
+				case 2://********************************************
+					return LookUpTable.Case_2[subCase];
+				case 3://********************************************
+					if (((reverseTriangles ? i : i ^ 0xFF) & FaceTestOne(subCase >> 1, cell)) != 0)
+					{
+						return LookUpTable.Case_3_2[subCase];
+					}
+					else
+					{
+						return LookUpTable.Case_3_1[subCase];
+					}
+				case 4://********************************************
+					if (InteriorTest(subCase, 0, cell) != 0)
+					{
+						return LookUpTable.Case_4_2[subCase];
+					}
+					else
+					{
+						return LookUpTable.Case_4_1[subCase];
+					}
+				case 5://********************************************
+					return LookUpTable.Case_5[subCase];
+				case 6://********************************************
+					if (((reverseTriangles ? i : i ^ 0xFF) & FaceTestOne(subCase % 6, cell)) != 0)
+					{
+						return LookUpTable.Case_6_2[subCase];
+					}
+					else if (InteriorTest(subCase / 6, 0, cell) != 0)
+					{
+						return LookUpTable.Case_6_1_2[subCase];
+					}
+					else
+					{
+						return LookUpTable.Case_6_1_1[subCase];
+					}
+				case 7://********************************************
+					switch (FaceTestAll(out int[] faces, i, (reverseTriangles ? 1 : -1), cell))
+					{
+						case -3:
+							return LookUpTable.Case_7_1[subCase];
+						case -1:
+							if (faces[4] + faces[5] == 1)
+							{
+								return LookUpTable.Case_7_2_1[subCase];
+							}
+							else
+							{
+								return (faces[(33825 >> (subCase << 1)) & 3] == 1 ? LookUpTable.Case_7_2_3 : LookUpTable.Case_7_2_2)[subCase];
+							}
+						case 1:
+							if (faces[4] + faces[5] == -1)
+							{
+								return LookUpTable.Case_7_3_3[subCase];
+							}
+							else
+							{
+								return (faces[(33825 >> (subCase << 1)) & 3] == 1 ? LookUpTable.Case_7_3_2 : LookUpTable.Case_7_3_1)[subCase];
+							}
+						case 3:
+							if (InteriorTest(subCase >> 1, 0, cell) != 0)
+							{
+								return LookUpTable.Case_7_4_2[subCase];
+							}
+							else
+							{
+								return LookUpTable.Case_7_4_1[subCase];
+							}
+						default:
+							throw new ArgumentOutOfRangeException("Case 7 test failed");
+					}
+				case 8://********************************************
+					return LookUpTable.Case_8[subCase];
+				case 9://********************************************
+					return LookUpTable.Case_9[subCase];
+				case 10://********************************************
+					switch (FaceTestAll(out faces, i, (!reverseTriangles ? -1 : 1), cell))
+					{
+						case -2:
+							if (subCase != 0 ? InteriorTest(0, 0, cell) != 0 || InteriorTest(lowestCaseBit == 0 ? 3 : 1, 0, cell) != 0 : InteriorTest(0, 0, cell) != 0)
+							{
+								return LookUpTable.Case_10_1_2_1[subCase];
+							}
+							else
+							{
+								return LookUpTable.Case_10_1_1_1[subCase];
+							}
+						case 2:
+							if (subCase != 0 ? InteriorTest(2, 0, cell) != 0 || InteriorTest(lowestCaseBit == 0 ? 1 : 3, 0, cell) != 0 : InteriorTest(1, 0, cell) != 0)
+							{
+								return LookUpTable.Case_10_1_2_2[subCase];
+							}
+							else
+							{
+								return LookUpTable.Case_10_1_1_2[subCase];
+							}
+						case 0:
+							return (faces[4 >> (subCase << 1)] == 1 ? LookUpTable.Case_10_2_2 : LookUpTable.Case_10_2_1)[subCase];
+						default:
+							throw new ArgumentOutOfRangeException("Case 10 test failed");
+					}
+				case 11://********************************************
+					return LookUpTable.Case_11[subCase];
+				case 12://********************************************
+					switch (FaceTestAll(out faces, i, (reverseTriangles ? 1 : -1), cell))
+					{
+						case -2:
+							if (InteriorTest(LookUpTable._12_test_index[0, subCase], 0, cell) != 0)
+							{
+								return LookUpTable.Case_12_1_2_1[subCase];
+							}
+							else
+							{
+								return LookUpTable.Case_12_1_1_1[subCase];
+							}
+						case 2:
+							if (InteriorTest(LookUpTable._12_test_index[1, subCase], 0, cell) != 0)
+							{
+								return LookUpTable.Case_12_1_2_2[subCase];
+							}
+							else
+							{
+								return LookUpTable.Case_12_1_1_2[subCase];
+							}
+						case 0:
+							if (faces[LookUpTable._12_test_index[2, subCase]] == 1)
+							{
+								return LookUpTable.Case_12_2_2[subCase];
+							}
+							else
+							{
+								return LookUpTable.Case_12_2_1[subCase];
+							}
+						default:
+							throw new ArgumentOutOfRangeException("Case 12 test failed");
+					}
+				case 13://********************************************
+					int caseCode = FaceTestAll(out faces, i, (reverseTriangles ? 1 : -1), cell);
+					switch (Math.Abs(caseCode))
+					{
+						case 6:
+							return LookUpTable.Case_13_1[(caseCode > 0 ? 1 : 0)];
+						case 4:
+							caseCode >>= 2;
+							i = 0;
+							while (faces[i] != -caseCode)
+							{
+								++i;
+							}
+
+							return LookUpTable.Case_13_2[(3 * caseCode + 3 + i)];
+						case 2:
+							caseCode = (((((((ToInt(faces[0] < 0) << 1) | ToInt(faces[1] < 0)) << 1) | ToInt(faces[2] < 0)) << 1) |
+									ToInt(faces[3] < 0)) << 1) | ToInt(faces[4] < 0);
+							return LookUpTable.Case_13_3[(25 - caseCode + ((ToInt(caseCode > 10) + ToInt(caseCode > 20)) << 1))];
+						case 0:
+							caseCode = (ToInt(faces[1] < 0) << 1) | ToInt(faces[5] < 0);
+							if (faces[0] * faces[1] * faces[5] == 1)
+							{
+								return LookUpTable.Case_13_4[caseCode];
+							}
+							else
+							{
+								i = InteriorTest(caseCode, 1, cell);
+								if (i != 0)
+								{
+									return LookUpTable.Case_13_5_2[(caseCode | ((i & 1) << 2))];
+								}
+								else
+								{
+									return LookUpTable.Case_13_5_1[caseCode];
+								}
+							}
+						default:
+							throw new ArgumentOutOfRangeException("Case 13 test failed");
+					}
+				case 14:
+					return LookUpTable.Case_14[subCase];
+				default:
+					throw new ArgumentOutOfRangeException("MC case code out of range");
+			}
+		}
+
 		/******************************************************************
 		This function find the MC33 case (using the index i, and the face and interior
 		tests). The correct triangle pattern is obtained from the arrays contained in
@@ -174,264 +363,32 @@ namespace MC_33
 		static void FindCase(Grid grid, Surface surface, int x, int y, int z, int i, float[] cell,
 			int[] oldLayer, int[] newLayer, int[,] oldY, int[,] newY, int[,] oldX, int[,] newX)
 		{
-			ushort[] casePoints = new ushort[0];
 			float t;
 			float[] point = new float[3];
-			int k;
-			int[] faces = new int[6];//for the face tests
+			int vertexIndex;
 			int[] pointIndices = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 			bool reverseTriangles = (i & 0x80) > 0;
 
 			int caseCode = LookUpTable.Case_Index[!reverseTriangles ? i : i ^ 0xFF];
 			int mc33Case = caseCode >> 8;
 			int subCase = caseCode & 0x7F;
-			switch (mc33Case)//find the MC33 case
+			int lowestCaseBit = caseCode & 0x01;
+
+			if ((caseCode & 0x0080) != 0)
 			{
-				case 1://********************************************
-					if ((caseCode & 0x0080) != 0)
-					{
-						reverseTriangles = !reverseTriangles;
-					}
-
-					casePoints = LookUpTable.Case_1[subCase];
-					break;
-				case 2://********************************************
-					if ((caseCode & 0x0080) != 0)
-					{
-						reverseTriangles = !reverseTriangles;
-					}
-
-					casePoints = LookUpTable.Case_2[subCase];
-					break;
-				case 3://********************************************
-					if ((caseCode & 0x0080) != 0)
-					{
-						reverseTriangles = !reverseTriangles;
-					}
-
-					if (((reverseTriangles ? i : i ^ 0xFF) & FaceTestOne(subCase >> 1, cell)) != 0)
-					{
-						casePoints = LookUpTable.Case_3_2[subCase];
-					}
-					else
-					{
-						casePoints = LookUpTable.Case_3_1[subCase];
-					}
-
-					break;
-				case 4://********************************************
-					if ((caseCode & 0x0080) != 0)
-					{
-						reverseTriangles = !reverseTriangles;
-					}
-
-					if (InteriorTest(subCase, 0, cell) != 0)
-					{
-						casePoints = LookUpTable.Case_4_2[subCase];
-					}
-					else
-					{
-						casePoints = LookUpTable.Case_4_1[subCase];
-					}
-
-					break;
-				case 5://********************************************
-					if ((caseCode & 0x0080) != 0)
-					{
-						reverseTriangles = !reverseTriangles;
-					}
-
-					casePoints = LookUpTable.Case_5[subCase];
-					break;
-				case 6://********************************************
-					if ((caseCode & 0x0080) != 0)
-					{
-						reverseTriangles = !reverseTriangles;
-					}
-
-					if (((reverseTriangles ? i : i ^ 0xFF) & FaceTestOne(subCase % 6, cell)) != 0)
-					{
-						casePoints = LookUpTable.Case_6_2[subCase];
-					}
-					else if (InteriorTest(subCase / 6, 0, cell) != 0)
-					{
-						casePoints = LookUpTable.Case_6_1_2[subCase];
-					}
-					else
-					{
-						casePoints = LookUpTable.Case_6_1_1[subCase];
-					}
-
-					break;
-				case 7://********************************************
-					if ((caseCode & 0x0080) != 0)
-					{
-						reverseTriangles = !reverseTriangles;
-					}
-
-					switch (FaceTestAll(faces, i, (reverseTriangles ? 1 : -1), cell))
-					{
-						case -3:
-							casePoints = LookUpTable.Case_7_1[subCase];
-							break;
-						case -1:
-							if (faces[4] + faces[5] == 1)
-							{
-								casePoints = LookUpTable.Case_7_2_1[subCase];
-							}
-							else
-							{
-								casePoints = (faces[(33825 >> (subCase << 1)) & 3] == 1 ? LookUpTable.Case_7_2_3 : LookUpTable.Case_7_2_2)[subCase];
-							}
-
-							break;
-						case 1:
-							if (faces[4] + faces[5] == -1)
-							{
-								casePoints = LookUpTable.Case_7_3_3[subCase];
-							}
-							else
-							{
-								casePoints = (faces[(33825 >> (subCase << 1)) & 3] == 1 ? LookUpTable.Case_7_3_2 : LookUpTable.Case_7_3_1)[subCase];
-							}
-
-							break;
-						case 3:
-							if (InteriorTest(subCase >> 1, 0, cell) != 0)
-							{
-								casePoints = LookUpTable.Case_7_4_2[subCase];
-							}
-							else
-							{
-								casePoints = LookUpTable.Case_7_4_1[subCase];
-							}
-
-							break;
-					}
-					break;
-				case 8://********************************************
-					casePoints = LookUpTable.Case_8[subCase];
-					break;
-				case 9://********************************************
-					casePoints = LookUpTable.Case_9[subCase];
-					break;
-				case 10://********************************************
-					switch (FaceTestAll(faces, i, (!reverseTriangles ? -1 : 1), cell))
-					{
-						case -2:
-							if (subCase != 0 ? InteriorTest(0, 0, cell) != 0 || InteriorTest((caseCode & 0x01) == 0 ? 3 : 1, 0, cell) != 0 : InteriorTest(0, 0, cell) != 0)
-							{
-								casePoints = LookUpTable.Case_10_1_2_1[subCase];
-							}
-							else
-							{
-								casePoints = LookUpTable.Case_10_1_1_1[subCase];
-							}
-
-							break;
-						case 2:
-							if (subCase != 0 ? InteriorTest(2, 0, cell) != 0 || InteriorTest((caseCode & 0x01) != 0 ? 3 : 1, 0, cell) != 0 : InteriorTest(1, 0, cell) != 0)
-							{
-								casePoints = LookUpTable.Case_10_1_2_2[subCase];
-							}
-							else
-							{
-								casePoints = LookUpTable.Case_10_1_1_2[subCase];
-							}
-
-							break;
-						case 0:
-							casePoints = (faces[4 >> (subCase << 1)] == 1 ? LookUpTable.Case_10_2_2 : LookUpTable.Case_10_2_1)[subCase];
-							break;
-					}
-					break;
-				case 11://********************************************
-					casePoints = LookUpTable.Case_11[subCase];
-					break;
-				case 12://********************************************
-					switch (FaceTestAll(faces, i, (reverseTriangles ? 1 : -1), cell))
-					{
-						case -2:
-							if (InteriorTest(LookUpTable._12_test_index[0, subCase], 0, cell) != 0)
-							{
-								casePoints = LookUpTable.Case_12_1_2_1[subCase];
-							}
-							else
-							{
-								casePoints = LookUpTable.Case_12_1_1_1[subCase];
-							}
-
-							break;
-						case 2:
-							if (InteriorTest(LookUpTable._12_test_index[1, subCase], 0, cell) != 0)
-							{
-								casePoints = LookUpTable.Case_12_1_2_2[subCase];
-							}
-							else
-							{
-								casePoints = LookUpTable.Case_12_1_1_2[subCase];
-							}
-
-							break;
-						case 0:
-							casePoints = (faces[LookUpTable._12_test_index[2, subCase]] == 1 ? LookUpTable.Case_12_2_2 : LookUpTable.Case_12_2_1)[subCase];
-							break;
-					}
-					break;
-				case 13://********************************************
-					caseCode = FaceTestAll(faces, i, (reverseTriangles ? 1 : -1), cell);
-					switch (Math.Abs(caseCode))
-					{
-						case 6:
-							casePoints = LookUpTable.Case_13_1[(caseCode > 0 ? 1 : 0)];
-							break;
-						case 4:
-							caseCode >>= 2;
-							i = 0;
-							while (faces[i] != -caseCode)
-							{
-								++i;
-							}
-
-							casePoints = LookUpTable.Case_13_2[(3 * caseCode + 3 + i)];
-							break;
-						case 2:
-							caseCode = (((((((ToInt(faces[0] < 0) << 1) | ToInt(faces[1] < 0)) << 1) | ToInt(faces[2] < 0)) << 1) |
-									ToInt(faces[3] < 0)) << 1) | ToInt(faces[4] < 0);
-							casePoints = LookUpTable.Case_13_3[(25 - caseCode + ((ToInt(caseCode > 10) + ToInt(caseCode > 20)) << 1))];
-							break;
-						case 0:
-							caseCode = (ToInt(faces[1] < 0) << 1) | ToInt(faces[5] < 0);
-							if (faces[0] * faces[1] * faces[5] == 1)
-							{
-								casePoints = LookUpTable.Case_13_4[caseCode];
-							}
-							else
-							{
-								i = InteriorTest(caseCode, 1, cell);
-								if (i != 0)
-								{
-									casePoints = LookUpTable.Case_13_5_2[(caseCode | ((i & 1) << 2))];
-								}
-								else
-								{
-									casePoints = LookUpTable.Case_13_5_1[caseCode];
-								}
-							}
-							break;
-					}
-					break;
-				case 14:
-					casePoints = LookUpTable.Case_14[subCase];
-					break;
+				reverseTriangles = !reverseTriangles;
 			}
+
+			ushort[] casePoints = GetCasePoints(i, cell, mc33Case, subCase, lowestCaseBit, reverseTriangles);
+
+			int[] triangle = new int[3];
+
 			foreach (ushort caseItem in casePoints)
 			{
-				ushort j = caseItem;
-				for (k = 0; k < 3; ++k)
+				for (vertexIndex = 0; vertexIndex < 3; ++vertexIndex)
 				{
-					caseCode = j & 0x0F;
-					j >>= 4;
+					caseCode = (caseItem >> (4 * vertexIndex)) & 0x0F;
+
 					if (pointIndices[caseCode] < 0)
 					{
 						switch (caseCode)//the vertices r[3] and normals n[3] are calculated here
@@ -1032,16 +989,16 @@ namespace MC_33
 								break;
 						}
 					}
-					faces[k] = pointIndices[caseCode];//now f contains the vertex indices of the triangle
+					triangle[vertexIndex] = pointIndices[caseCode];//now f contains the vertex indices of the triangle
 				}
-				if (faces[0] != faces[1] && faces[0] != faces[2] && faces[1] != faces[2])//to avoid zero area triangles
+				if (triangle[0] != triangle[1] && triangle[0] != triangle[2] && triangle[1] != triangle[2])//to avoid zero area triangles
 				{
 					if (reverseTriangles)//The order of triangle vertices is reversed if m is not zero
 					{
-						faces[2] = faces[0]; 
-						faces[0] = pointIndices[caseCode];
+						triangle[2] = triangle[0]; 
+						triangle[0] = pointIndices[caseCode];
 					}
-					surface.AddTriangle(faces[0], faces[1], faces[2]);
+					surface.AddTriangle(triangle[0], triangle[1], triangle[2]);
 				}
 			}
 		}
