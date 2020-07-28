@@ -13,4 +13,4 @@ install:
 
 script:
  - dotnet build
- - dotnet test MC-33-Tests/MC-33-Tests.csproj
+ - dotnet test MC-33.Test/MC-33.Test.csproj
