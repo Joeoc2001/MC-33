@@ -9,7 +9,7 @@ namespace MC_33
 
 		private static int SignBit(float i)
 		{
-			return i < 0 ? 1 : 0;
+			return Math.Sign(i) < 0 ? 1 : 0;
 		}
 
 		/******************************************************************
