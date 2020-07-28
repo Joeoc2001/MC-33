@@ -3,38 +3,8 @@ using System.Numerics;
 
 namespace MC_33
 {
-    internal static class MarchingCubes
-    {
-		/* _MC_DVE and _MC_A are calculated using _MC_N.
-		_MC_A is a mask (n & _MC_A is equivalent to n % _MC_DVE).
-		n >> _MC_N is equivalent to n / _MC_DVE. */
-		//static int _MC_N = default_MC_N, _MC_DVE = 1 << default_MC_N, _MC_A = (1 << default_MC_N) - 1;
-
-		//static void set_MC_DVE(unsigned int size)
-		//{
-		//	_MC_N = 0;
-		//	--size;
-		//	while (size)
-		//	{
-		//		++_MC_N;
-		//		size >>= 1;
-		//	}
-		//	if (_MC_N < 6 != 0)
-		//		_MC_N = 6;
-		//	_MC_DVE = 1 << _MC_N;
-		//	_MC_A = _MC_DVE - 1;
-		//}
-
-		// static int incDimTVN = 1 << 9;
-
-		/*_MCnT and _MCnV are the value of the first dimension of arrays T and V of the
-		structure surface. They are used in store_point_normal and store_triangle.
-		functions*/
-		//static int _MCnT, _MCnV;
-
-		//static GRD_data_type*** _MC_F = 0; <- Grid data
-		//static float _MC_O[3], _MC_D[3];
-
+	internal static class MarchingCubes
+	{
 		private static int ToInt(bool b) { return b ? 1 : 0; }
 		private static int SignBit(float i)
 		{
@@ -129,15 +99,23 @@ namespace MC_33
 			float t = At * Ct - Bt * Dt;//the "a" value.
 			if ((i & 0x01) != 0)//false for i = 0 and 2, and true for i = 1 and 3
 			{
-				if (t <= 0.0f) return 0;
+				if (t <= 0.0f)
+				{
+					return 0;
+				}
 			}
 			else
 			{
-				if (t >= 0.0f) return 0;
+				if (t >= 0.0f)
+				{
+					return 0;
+				}
 			}
 			t = 0.5f * (v[3] * Bt + v[1] * Dt - v[2] * At - v[0] * Ct) / t;//t = -b/2a
 			if (t <= 0.0f || t >= 1.0f)
+			{
 				return 0;
+			}
 
 			At = v[0] + At * t;
 			Bt = v[1] + Bt * t;
@@ -146,12 +124,16 @@ namespace MC_33
 			if ((i & 0x01) != 0)
 			{
 				if (At * Ct < Bt * Dt && SignBit(Bt) == SignBit(Dt))
+				{
 					return ToInt(SignBit(Bt) == SignBit(v[i])) + flagtplane;
+				}
 			}
 			else
 			{
 				if (At * Ct > Bt * Dt && SignBit(At) == SignBit(Ct))
+				{
 					return ToInt(SignBit(At) == SignBit(v[i])) + flagtplane;
+				}
 			}
 			return 0;
 		}
@@ -160,67 +142,14 @@ namespace MC_33
 		Assign memory for the vertex r[3], normal n[3]. The return value is the new
 		vertex label.
 		*/
-		static int store_point_normal(Grid grid, Surface s, float[] r, float[] n)
+		static int store_point_normal(Grid grid, Surface s, float[] r)
 		{
-			//int i, nv = (++surface->nV) & _MC_A;
-			//float t = 0.0f, *p;
-			//void* pv, *pn, *pc;
-			//if (nv == 0)//create a new surface->V[*][][], and surface->N[*][][], and surface->color[*][]
-			//{
-			//	if (!((++_MCnV) & (incDimTVN - 1)) != 0)//expand the surface->V[] dimension in incDimTVN
-			//	{
-			//		pc = realloc(surface->color, (_MCnV + incDimTVN) * sizeof(void*));
-			//		pn = realloc(surface->N, (_MCnV + incDimTVN) * sizeof(void*));
-			//		pv = realloc(surface->V, (_MCnV + incDimTVN) * sizeof(void*));
-			//		if (pv != 0)
-			//		{
-			//			surface->V = (float(**)[3])pv;
-			//			surface->N = (float(**)[3])pn;
-			//			surface->color = (int[][])pc;
-			//		}
-			//		else
-			//		{
-			//			if (pn != 0)
-			//				surface->N = (float(**)[3])pn;
-			//			if (pc != 0)
-			//				surface->color = (int[][])pc;
-			//			_MC_memory_error(0);
-			//			return 0;
-			//		}
-			//	}
-			//	surface->color[_MCnV] = (int[])malloc(_MC_DVE * sizeof(int));
-			//	surface->N[_MCnV] = (float(*)[3])malloc(3 * _MC_DVE * sizeof(float));
-			//	surface->V[_MCnV] = (float(*)[3])malloc(3 * _MC_DVE * sizeof(float));
-			//	if (!surface->V[_MCnV])
-			//	{
-			//		free(surface->N[_MCnV]);
-			//		free(surface->color[_MCnV]);
-			//		_MC_memory_error(0 != 0);
-			//		return 0;
-			//	}
-			//}
-			//surface->color[_MCnV][nv] = DefaultColorMC;
-			//p = surface->V[_MCnV][nv];
-			//for (i = 0; i < 3; ++i)
-			//	p[i] = r[i] * _MC_D[i] + _MC_O[i];
-			//for (i = 0; i < 3; ++i)
-			//	t += n[i] * n[i];
-
-			//float t = (float) (1.0 / Math.Sqrt(n[0]*n[0] + n[1]*n[1] + n[2]*n[2]));
-			//for (int i = 0; i < 3; ++i)
-			//	n[i] = t * n[i];
 
 			Vector3 pos = new Vector3(r[0], r[1], r[2]);
 			pos *= grid.Offset;
 			pos += grid.Origin;
-			//Vector3 norm = new Vector3(n[0], n[1], n[2]);
 
 			return s.AddVertex(pos);
-
-			//t = invSqrt(t);
-
-			//p = surface->N[_MCnV][nv];
-			//return surface->nV;
 		}
 
 		/******************************************************************
@@ -239,24 +168,45 @@ namespace MC_33
 		{
 			r[0] = x; r[1] = y; r[2] = z;
 			if (x == 0)
+			{
 				n[0] = grid[0, y, z] - grid[1, y, z];
+			}
 			else if (x == grid.SizeX)
+			{
 				n[0] = grid[x - 1, y, z] - grid[x, y, z];
+			}
 			else
+			{
 				n[0] = 0.5f * (grid[x - 1, y, z] - grid[x + 1, y, z]);
+			}
+
 			if (y == 0)
+			{
 				n[1] = grid[x, 0, z] - grid[x, 1, z];
+			}
 			else if (y == grid.SizeY)
+			{
 				n[1] = grid[x, y - 1, z] - grid[x, y, z];
+			}
 			else
+			{
 				n[1] = 0.5f * (grid[x, y - 1, z] - grid[x, y + 1, z]);
+			}
+
 			if (z == 0)
+			{
 				n[2] = grid[x, y, 0] - grid[x, y, 1];
+			}
 			else if (z == grid.SizeZ)
+			{
 				n[2] = grid[x, y, z - 1] - grid[x, y, z];
+			}
 			else
+			{
 				n[2] = 0.5f * (grid[x, y, z - 1] - grid[x, y, z + 1]);
-			return store_point_normal(grid, s, r, n);
+			}
+
+			return store_point_normal(grid, s, r);
 		}
 
 		/******************************************************************
@@ -289,48 +239,90 @@ namespace MC_33
 			int[] p = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 			int m = i & 0x80;
 			int c = LookUpTable.Case_Index[m == 0 ? i : i ^ 0xFF];
-			//	static int count4bits[] = {0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4};
-			//	h = count4bits[i&0x0F] + count4bits[i>>4];
-			//	m = (h&0xFC? (h == 4? (i&0x80? 1: 0): 0): 1);//count bit
 			switch (c >> 8)//find the MC33 case
 			{
 				case 1://********************************************
-					if ((c & 0x0080) != 0) m ^= 0x80;
+					if ((c & 0x0080) != 0)
+					{
+						m ^= 0x80;
+					}
+
 					pcase = LookUpTable.Case_1[(c & 0x7F)];
 					break;
 				case 2://********************************************
-					if ((c & 0x0080) != 0) m ^= 0x80;
+					if ((c & 0x0080) != 0)
+					{
+						m ^= 0x80;
+					}
+
 					pcase = LookUpTable.Case_2[(c & 0x7F)];
 					break;
 				case 3://********************************************
-					if ((c & 0x0080) != 0) m ^= 0x80;
+					if ((c & 0x0080) != 0)
+					{
+						m ^= 0x80;
+					}
+
 					if (((m != 0 ? i : i ^ 0xFF) & face_test1((c & 0x7F) >> 1, v)) != 0)
+					{
 						pcase = LookUpTable.Case_3_2[(c & 0x7F)];
+					}
 					else
+					{
 						pcase = LookUpTable.Case_3_1[(c & 0x7F)];
+					}
+
 					break;
 				case 4://********************************************
-					if ((c & 0x0080) != 0) m ^= 0x80;
+					if ((c & 0x0080) != 0)
+					{
+						m ^= 0x80;
+					}
+
 					if (interior_test((c & 0x7F), 0, v) != 0)
+					{
 						pcase = LookUpTable.Case_4_2[(c & 0x7F)];
+					}
 					else
+					{
 						pcase = LookUpTable.Case_4_1[(c & 0x7F)];
+					}
+
 					break;
 				case 5://********************************************
-					if ((c & 0x0080) != 0) m ^= 0x80;
+					if ((c & 0x0080) != 0)
+					{
+						m ^= 0x80;
+					}
+
 					pcase = LookUpTable.Case_5[(c & 0x7F)];
 					break;
 				case 6://********************************************
-					if ((c & 0x0080) != 0) m ^= 0x80;
+					if ((c & 0x0080) != 0)
+					{
+						m ^= 0x80;
+					}
+
 					if (((m != 0 ? i : i ^ 0xFF) & face_test1((c & 0x7F) % 6, v)) != 0)
+					{
 						pcase = LookUpTable.Case_6_2[(c & 0x7F)];
+					}
 					else if (interior_test((c & 0x7F) / 6, 0, v) != 0)
+					{
 						pcase = LookUpTable.Case_6_1_2[(c & 0x7F)];
+					}
 					else
+					{
 						pcase = LookUpTable.Case_6_1_1[(c & 0x7F)];
+					}
+
 					break;
 				case 7://********************************************
-					if ((c & 0x0080) != 0) m ^= 0x80;
+					if ((c & 0x0080) != 0)
+					{
+						m ^= 0x80;
+					}
+
 					switch (face_tests(f, i, (m != 0 ? 1 : -1), v))
 					{
 						case -3:
@@ -338,21 +330,36 @@ namespace MC_33
 							break;
 						case -1:
 							if (f[4] + f[5] == 1)
+							{
 								pcase = LookUpTable.Case_7_2_1[(c & 0x7F)];
+							}
 							else
+							{
 								pcase = (f[(33825 >> ((c & 0x7F) << 1)) & 3] == 1 ? LookUpTable.Case_7_2_3 : LookUpTable.Case_7_2_2)[(c & 0x7F)];
+							}
+
 							break;
 						case 1:
 							if (f[4] + f[5] == -1)
+							{
 								pcase = LookUpTable.Case_7_3_3[(c & 0x7F)];
+							}
 							else
+							{
 								pcase = (f[(33825 >> ((c & 0x7F) << 1)) & 3] == 1 ? LookUpTable.Case_7_3_2 : LookUpTable.Case_7_3_1)[(c & 0x7F)];
+							}
+
 							break;
 						case 3:
 							if (interior_test((c & 0x7F) >> 1, 0, v) != 0)
+							{
 								pcase = LookUpTable.Case_7_4_2[(c & 0x7F)];
+							}
 							else
+							{
 								pcase = LookUpTable.Case_7_4_1[(c & 0x7F)];
+							}
+
 							break;
 					}
 					break;
@@ -367,15 +374,25 @@ namespace MC_33
 					{
 						case -2:
 							if ((c & 0x7F) != 0 ? interior_test(0, 0, v) != 0 || interior_test((c & 0x01) == 0 ? 3 : 1, 0, v) != 0 : interior_test(0, 0, v) != 0)
+							{
 								pcase = LookUpTable.Case_10_1_2_1[(c & 0x7F)];
+							}
 							else
+							{
 								pcase = LookUpTable.Case_10_1_1_1[(c & 0x7F)];
+							}
+
 							break;
 						case 2:
 							if ((c & 0x7F) != 0 ? interior_test(2, 0, v) != 0 || interior_test((c & 0x01) != 0 ? 3 : 1, 0, v) != 0 : interior_test(1, 0, v) != 0)
+							{
 								pcase = LookUpTable.Case_10_1_2_2[(c & 0x7F)];
+							}
 							else
+							{
 								pcase = LookUpTable.Case_10_1_1_2[(c & 0x7F)];
+							}
+
 							break;
 						case 0:
 							pcase = (f[4 >> ((c & 0x7F) << 1)] == 1 ? LookUpTable.Case_10_2_2 : LookUpTable.Case_10_2_1)[(c & 0x7F)];
@@ -389,19 +406,29 @@ namespace MC_33
 					switch (face_tests(f, i, (m != 0 ? 1 : -1), v))
 					{
 						case -2:
-							if (interior_test((int)LookUpTable._12_test_index[0, c & 0x7F], 0, v) != 0)
+							if (interior_test(LookUpTable._12_test_index[0, c & 0x7F], 0, v) != 0)
+							{
 								pcase = LookUpTable.Case_12_1_2_1[(c & 0x7F)];
+							}
 							else
+							{
 								pcase = LookUpTable.Case_12_1_1_1[(c & 0x7F)];
+							}
+
 							break;
 						case 2:
-							if (interior_test((int)LookUpTable._12_test_index[1, c & 0x7F], 0, v) != 0)
+							if (interior_test(LookUpTable._12_test_index[1, c & 0x7F], 0, v) != 0)
+							{
 								pcase = LookUpTable.Case_12_1_2_2[(c & 0x7F)];
+							}
 							else
+							{
 								pcase = LookUpTable.Case_12_1_1_2[(c & 0x7F)];
+							}
+
 							break;
 						case 0:
-							pcase = (f[(int)LookUpTable._12_test_index[2, c & 0x7F]] == 1 ? LookUpTable.Case_12_2_2 : LookUpTable.Case_12_2_1)[(c & 0x7F)];
+							pcase = (f[LookUpTable._12_test_index[2, c & 0x7F]] == 1 ? LookUpTable.Case_12_2_2 : LookUpTable.Case_12_2_1)[(c & 0x7F)];
 							break;
 					}
 					break;
@@ -416,7 +443,10 @@ namespace MC_33
 							c >>= 2;
 							i = 0;
 							while (f[i] != -c)
+							{
 								++i;
+							}
+
 							pcase = LookUpTable.Case_13_2[(3 * c + 3 + i)];
 							i = 1;
 							break;
@@ -428,12 +458,16 @@ namespace MC_33
 						case 0:
 							c = (ToInt(f[1] < 0) << 1) | ToInt(f[5] < 0);
 							if (f[0] * f[1] * f[5] == 1)
+							{
 								pcase = LookUpTable.Case_13_4[c];
+							}
 							else
 							{
 								i = interior_test(c, 1, v);
 								if (i != 0)
+								{
 									pcase = LookUpTable.Case_13_5_2[(c | ((i & 1) << 2))];
+								}
 								else
 								{
 									pcase = LookUpTable.Case_13_5_1[c];
@@ -460,20 +494,36 @@ namespace MC_33
 						{
 							case 0:
 								if (z != 0 || x != 0)
+								{
 									p[0] = _Oy[y, x];
+								}
 								else
 								{
 									if (v[0] == 0.0f)
 									{
 										p[0] = surfint(grid, s, 0, y, 0, r, n);
-										if (SignBit(v[3]) != 0) p[3] = p[0];
-										if (SignBit(v[4]) != 0) p[8] = p[0];
+										if (SignBit(v[3]) != 0)
+										{
+											p[3] = p[0];
+										}
+
+										if (SignBit(v[4]) != 0)
+										{
+											p[8] = p[0];
+										}
 									}
 									else if (v[1] == 0.0f)
 									{
 										p[0] = surfint(grid, s, 0, y + 1, 0, r, n);
-										if (SignBit(v[2]) != 0) _NL[0] = p[1] = p[0];
-										if (SignBit(v[5]) != 0) _Ox[y + 1, 0] = p[9] = p[0];
+										if (SignBit(v[2]) != 0)
+										{
+											_NL[0] = p[1] = p[0];
+										}
+
+										if (SignBit(v[5]) != 0)
+										{
+											_Ox[y + 1, 0] = p[9] = p[0];
+										}
 									}
 									else
 									{
@@ -483,30 +533,46 @@ namespace MC_33
 										n[0] = (v[4] - v[0]) * (1.0f - t) + (v[5] - v[1]) * t;
 										n[1] = v[1] - v[0];
 										n[2] = (v[3] - v[0]) * (1.0f - t) + (v[2] - v[1]) * t;
-										p[0] = store_point_normal(grid, s, r, n);
+										p[0] = store_point_normal(grid, s, r);
 									}
 								}
 								break;
 							case 1:
 								if (x != 0)
+								{
 									p[1] = _NL[x];
+								}
 								else
 								{
 									if (v[1] == 0.0f)
 									{
 										_NL[0] = p[1] = surfint(grid, s, 0, y + 1, z, r, n);
-										if (SignBit(v[0]) != 0) p[0] = p[1];
+										if (SignBit(v[0]) != 0)
+										{
+											p[0] = p[1];
+										}
+
 										if (SignBit(v[5]) != 0)
 										{
 											p[9] = p[1];
-											if (z == 0) _Ox[y + 1, 0] = p[9];
+											if (z == 0)
+											{
+												_Ox[y + 1, 0] = p[9];
+											}
 										}
 									}
 									else if (v[2] == 0.0f)
 									{
 										_NL[0] = p[1] = surfint(grid, s, 0, y + 1, z + 1, r, n);
-										if (SignBit(v[3]) != 0) _Ny[y, 0] = p[2] = p[1];
-										if (SignBit(v[6]) != 0) _Nx[y + 1, 0] = p[10] = p[1];
+										if (SignBit(v[3]) != 0)
+										{
+											_Ny[y, 0] = p[2] = p[1];
+										}
+
+										if (SignBit(v[6]) != 0)
+										{
+											_Nx[y + 1, 0] = p[10] = p[1];
+										}
 									}
 									else
 									{
@@ -518,30 +584,46 @@ namespace MC_33
 													+ (grid[0, y, z + 1] - grid[0, y + 2, z + 1]) * t) :
 													(v[1] - v[0]) * (1.0f - t) + (v[2] - v[3]) * t);
 										n[2] = v[2] - v[1];
-										_NL[0] = p[1] = store_point_normal(grid, s, r, n);
+										_NL[0] = p[1] = store_point_normal(grid, s, r);
 									}
 								}
 								break;
 							case 2:
 								if (x != 0)
+								{
 									p[2] = _Ny[y, x];
+								}
 								else
 								{
 									if (v[3] == 0.0f)
 									{
 										_Ny[y, 0] = p[2] = surfint(grid, s, 0, y, z + 1, r, n);
-										if (SignBit(v[0]) != 0) p[3] = p[2];
+										if (SignBit(v[0]) != 0)
+										{
+											p[3] = p[2];
+										}
+
 										if (SignBit(v[7]) != 0)
 										{
 											p[11] = p[2];
-											if (y == 0) _Nx[0, 0] = p[11];
+											if (y == 0)
+											{
+												_Nx[0, 0] = p[11];
+											}
 										}
 									}
 									else if (v[2] == 0.0f)
 									{
 										_Ny[y, 0] = p[2] = surfint(grid, s, 0, y + 1, z + 1, r, n);
-										if (SignBit(v[1]) != 0) _NL[0] = p[1] = p[2];
-										if (SignBit(v[6]) != 0) _Nx[y + 1, 0] = p[10] = p[2];
+										if (SignBit(v[1]) != 0)
+										{
+											_NL[0] = p[1] = p[2];
+										}
+
+										if (SignBit(v[6]) != 0)
+										{
+											_Nx[y + 1, 0] = p[10] = p[2];
+										}
 									}
 									else
 									{
@@ -553,26 +635,42 @@ namespace MC_33
 										n[2] = (z + 1 < grid.SizeZ ? 0.5f * ((grid[0, y, z] - grid[0, y, z + 2]) * (1.0f - t)
 													+ (grid[0, y + 1, z] - grid[0, y + 1, z + 2]) * t) :
 													(v[3] - v[0]) * (1.0f - t) + (v[2] - v[1]) * t);
-										_Ny[y, 0] = p[2] = store_point_normal(grid, s, r, n);
+										_Ny[y, 0] = p[2] = store_point_normal(grid, s, r);
 									}
 								}
 								break;
 							case 3:
 								if (y != 0 || x != 0)
+								{
 									p[3] = _OL[x];
+								}
 								else
 								{
 									if (v[0] == 0.0f)
 									{
 										p[3] = surfint(grid, s, 0, 0, z, r, n);
-										if (SignBit(v[1]) != 0) p[0] = p[3];
-										if (SignBit(v[4]) != 0) p[8] = p[3];
+										if (SignBit(v[1]) != 0)
+										{
+											p[0] = p[3];
+										}
+
+										if (SignBit(v[4]) != 0)
+										{
+											p[8] = p[3];
+										}
 									}
 									else if (v[3] == 0.0f)
 									{
 										p[3] = surfint(grid, s, 0, 0, z + 1, r, n);
-										if (SignBit(v[2]) != 0) _Ny[0, 0] = p[2] = p[3];
-										if (SignBit(v[7]) != 0) _Nx[0, 0] = p[11] = p[3];
+										if (SignBit(v[2]) != 0)
+										{
+											_Ny[0, 0] = p[2] = p[3];
+										}
+
+										if (SignBit(v[7]) != 0)
+										{
+											_Nx[0, 0] = p[11] = p[3];
+										}
 									}
 									else
 									{
@@ -582,28 +680,47 @@ namespace MC_33
 										n[0] = (v[4] - v[0]) * (1.0f - t) + (v[7] - v[3]) * t;
 										n[1] = (v[1] - v[0]) * (1.0f - t) + (v[2] - v[3]) * t;
 										n[2] = v[3] - v[0];
-										p[3] = store_point_normal(grid, s, r, n);
+										p[3] = store_point_normal(grid, s, r);
 									}
 								}
 								break;
 							case 4:
 								if (z != 0)
+								{
 									p[4] = _Oy[y, x + 1];
+								}
 								else
 								{
 									if (v[4] == 0.0f)
 									{
 										_Oy[y, x + 1] = p[4] = surfint(grid, s, x + 1, y, 0, r, n);
-										if (SignBit(v[7]) != 0) p[7] = p[4];
-										if (SignBit(v[0]) != 0) p[8] = p[4];
+										if (SignBit(v[7]) != 0)
+										{
+											p[7] = p[4];
+										}
+
+										if (SignBit(v[0]) != 0)
+										{
+											p[8] = p[4];
+										}
+
 										if (y == 0)
+										{
 											_OL[x + 1] = p[7];
+										}
 									}
 									else if (v[5] == 0.0f)
 									{
 										_Oy[y, x + 1] = p[4] = surfint(grid, s, x + 1, y + 1, 0, r, n);
-										if (SignBit(v[6]) != 0) _NL[x + 1] = p[5] = p[4];
-										if (SignBit(v[1]) != 0) _Ox[y + 1, x] = p[9] = p[4];
+										if (SignBit(v[6]) != 0)
+										{
+											_NL[x + 1] = p[5] = p[4];
+										}
+
+										if (SignBit(v[1]) != 0)
+										{
+											_Ox[y + 1, x] = p[9] = p[4];
+										}
 									}
 									else
 									{
@@ -615,7 +732,7 @@ namespace MC_33
 													(v[4] - v[0]) * (1.0f - t) + (v[5] - v[1]) * t);
 										n[1] = v[5] - v[4];
 										n[2] = (v[7] - v[4]) * (1.0f - t) + (v[6] - v[5]) * t;
-										_Oy[y, x + 1] = p[4] = store_point_normal(grid, s, r, n);
+										_Oy[y, x + 1] = p[4] = store_point_normal(grid, s, r);
 									}
 								}
 								break;
@@ -627,29 +744,48 @@ namespace MC_33
 										if (z != 0)
 										{
 											_NL[x + 1] = p[5] = p[4] = _Oy[y, x + 1];
-											if (SignBit(v[1]) != 0) p[9] = p[5];
+											if (SignBit(v[1]) != 0)
+											{
+												p[9] = p[5];
+											}
 										}
 										else
 										{
 											_NL[x + 1] = p[5] = _Oy[y, x + 1] = p[4] = surfint(grid, s, x + 1, y + 1, 0, r, n);
-											if (SignBit(v[1]) != 0) _Ox[y + 1, x] = p[9] = p[5];
+											if (SignBit(v[1]) != 0)
+											{
+												_Ox[y + 1, x] = p[9] = p[5];
+											}
 										}
 									}
 									else if (SignBit(v[1]) != 0)
 									{
 										if (z != 0)
+										{
 											_NL[x + 1] = p[5] = p[9] = _Ox[y + 1, x];
+										}
 										else
+										{
 											_NL[x + 1] = p[5] = _Ox[y + 1, x] = p[9] = surfint(grid, s, x + 1, y + 1, 0, r, n);
+										}
 									}
 									else
+									{
 										_NL[x + 1] = p[5] = surfint(grid, s, x + 1, y + 1, z, r, n);
+									}
 								}
 								else if (v[6] == 0.0f)
 								{
 									_NL[x + 1] = p[5] = surfint(grid, s, x + 1, y + 1, z + 1, r, n);
-									if (SignBit(v[2]) != 0) _Nx[y + 1, x] = p[10] = p[5];
-									if (SignBit(v[7]) != 0) _Ny[y, x + 1] = p[6] = p[5];
+									if (SignBit(v[2]) != 0)
+									{
+										_Nx[y + 1, x] = p[10] = p[5];
+									}
+
+									if (SignBit(v[7]) != 0)
+									{
+										_Ny[y, x + 1] = p[6] = p[5];
+									}
 								}
 								else
 								{
@@ -663,7 +799,7 @@ namespace MC_33
 												+ (grid[x + 1, y, z + 1] - grid[x + 1, y + 2, z + 1]) * t) :
 												(v[5] - v[4]) * (1.0f - t) + (v[6] - v[7]) * t);
 									n[2] = v[6] - v[5];
-									_NL[x + 1] = p[5] = store_point_normal(grid, s, r, n);
+									_NL[x + 1] = p[5] = store_point_normal(grid, s, r);
 								}
 								break;
 							case 6:
@@ -674,29 +810,48 @@ namespace MC_33
 										if (y != 0)
 										{
 											_Ny[y, x + 1] = p[6] = p[11] = _Nx[y, x];
-											if (SignBit(v[4]) != 0) p[7] = p[6];
+											if (SignBit(v[4]) != 0)
+											{
+												p[7] = p[6];
+											}
 										}
 										else
 										{
 											_Ny[y, x + 1] = p[6] = _Nx[0, x] = p[11] = surfint(grid, s, x + 1, 0, z + 1, r, n);
-											if (SignBit(v[4]) != 0) _OL[x + 1] = p[7] = p[6];
+											if (SignBit(v[4]) != 0)
+											{
+												_OL[x + 1] = p[7] = p[6];
+											}
 										}
 									}
 									else if (SignBit(v[4]) != 0)
 									{
 										if (y != 0)
+										{
 											_Ny[y, x + 1] = p[6] = p[7] = _OL[x + 1];
+										}
 										else
+										{
 											_Ny[y, x + 1] = p[6] = _OL[x + 1] = p[7] = surfint(grid, s, x + 1, 0, z + 1, r, n);
+										}
 									}
 									else
+									{
 										_Ny[y, x + 1] = p[6] = surfint(grid, s, x + 1, y, z + 1, r, n);
+									}
 								}
 								else if (v[6] == 0.0f)
 								{
 									_Ny[y, x + 1] = p[6] = surfint(grid, s, x + 1, y + 1, z + 1, r, n);
-									if (SignBit(v[5]) != 0) _NL[x + 1] = p[5] = p[6];
-									if (SignBit(v[2]) != 0) _Nx[y + 1, x] = p[10] = p[6];
+									if (SignBit(v[5]) != 0)
+									{
+										_NL[x + 1] = p[5] = p[6];
+									}
+
+									if (SignBit(v[2]) != 0)
+									{
+										_Nx[y + 1, x] = p[10] = p[6];
+									}
 								}
 								else
 								{
@@ -710,30 +865,45 @@ namespace MC_33
 									n[2] = (z + 1 < grid.SizeZ ? 0.5f * ((grid[x + 1, y, z] - grid[x + 1, y, z + 2]) * (1.0f - t)
 													+ (grid[x + 1, y + 1, z] - grid[x + 1, y + 1, z + 2]) * t) :
 												(v[7] - v[4]) * (1.0f - t) + (v[6] - v[5]) * t);
-									_Ny[y, x + 1] = p[6] = store_point_normal(grid, s, r, n);
+									_Ny[y, x + 1] = p[6] = store_point_normal(grid, s, r);
 								}
 								break;
 							case 7:
 								if (y != 0)
+								{
 									p[7] = _OL[x + 1];
+								}
 								else
 								{
 									if (v[4] == 0.0f)
 									{
 										_OL[x + 1] = p[7] = surfint(grid, s, x + 1, 0, z, r, n);
-										if (SignBit(v[0]) != 0) p[8] = p[7];
+										if (SignBit(v[0]) != 0)
+										{
+											p[8] = p[7];
+										}
+
 										if (SignBit(v[5]) != 0)
 										{
 											p[4] = p[7];
 											if (z == 0)
+											{
 												_Oy[0, x + 1] = p[4];
+											}
 										}
 									}
 									else if (v[7] == 0.0f)
 									{
 										_OL[x + 1] = p[7] = surfint(grid, s, x + 1, 0, z + 1, r, n);
-										if (SignBit(v[6]) != 0) _Ny[0, x + 1] = p[6] = p[7];
-										if (SignBit(v[3]) != 0) _Nx[0, x] = p[11] = p[7];
+										if (SignBit(v[6]) != 0)
+										{
+											_Ny[0, x + 1] = p[6] = p[7];
+										}
+
+										if (SignBit(v[3]) != 0)
+										{
+											_Nx[0, x] = p[11] = p[7];
+										}
 									}
 									else
 									{
@@ -745,28 +915,42 @@ namespace MC_33
 													(v[4] - v[0]) * (1.0f - t) + (v[7] - v[3]) * t);
 										n[1] = (v[5] - v[4]) * (1.0f - t) + (v[6] - v[7]) * t;
 										n[2] = v[7] - v[4];
-										_OL[x + 1] = p[7] = store_point_normal(grid, s, r, n);
+										_OL[x + 1] = p[7] = store_point_normal(grid, s, r);
 									}
 								}
 								break;
 							case 8:
 								if (z != 0 || y != 0)
+								{
 									p[8] = _Ox[y, x];
+								}
 								else
 								{
 									if (v[0] == 0.0f)
 									{
 										p[8] = surfint(grid, s, x, 0, 0, r, n);
-										if (SignBit(v[1]) != 0) p[0] = p[8];
-										if (SignBit(v[3]) != 0) p[3] = p[8];
+										if (SignBit(v[1]) != 0)
+										{
+											p[0] = p[8];
+										}
+
+										if (SignBit(v[3]) != 0)
+										{
+											p[3] = p[8];
+										}
 									}
 									else if (v[4] == 0.0f)
 									{
 										p[8] = surfint(grid, s, x + 1, 0, 0, r, n);
 										if (SignBit(v[5]) != 0)
+										{
 											_Oy[0, x + 1] = p[4] = p[8];
+										}
+
 										if (SignBit(v[7]) != 0)
+										{
 											_OL[x + 1] = p[7] = p[8];
+										}
 									}
 									else
 									{
@@ -776,13 +960,15 @@ namespace MC_33
 										n[0] = v[4] - v[0];
 										n[1] = (v[1] - v[0]) * (1.0f - t) + (v[5] - v[4]) * t;
 										n[2] = (v[3] - v[0]) * (1.0f - t) + (v[7] - v[4]) * t;
-										p[8] = store_point_normal(grid, s, r, n);
+										p[8] = store_point_normal(grid, s, r);
 									}
 								}
 								break;
 							case 9:
 								if (z != 0)
+								{
 									p[9] = _Ox[y + 1, x];
+								}
 								else
 								{
 									if (v[1] == 0.0f)
@@ -791,15 +977,28 @@ namespace MC_33
 										if (SignBit(v[2]) != 0)
 										{
 											p[1] = p[9];
-											if (x == 0) _NL[0] = p[1];
+											if (x == 0)
+											{
+												_NL[0] = p[1];
+											}
 										}
-										if (SignBit(v[0]) != 0) p[0] = p[9];
+										if (SignBit(v[0]) != 0)
+										{
+											p[0] = p[9];
+										}
 									}
 									else if (v[5] == 0.0f)
 									{
 										_Ox[y + 1, x] = p[9] = surfint(grid, s, x + 1, y + 1, 0, r, n);
-										if (SignBit(v[6]) != 0) _NL[x + 1] = p[5] = p[9];
-										if (SignBit(v[4]) != 0) _Oy[y, x + 1] = p[4] = p[9];
+										if (SignBit(v[6]) != 0)
+										{
+											_NL[x + 1] = p[5] = p[9];
+										}
+
+										if (SignBit(v[4]) != 0)
+										{
+											_Oy[y, x + 1] = p[4] = p[9];
+										}
 									}
 									else
 									{
@@ -811,7 +1010,7 @@ namespace MC_33
 													+ (grid[x + 1, y, 0] - grid[x + 1, y + 2, 0]) * t) :
 													(v[1] - v[0]) * (1.0f - t) + (v[5] - v[4]) * t);
 										n[2] = (v[2] - v[1]) * (1.0f - t) + (v[6] - v[5]) * t;
-										_Ox[y + 1, x] = p[9] = store_point_normal(grid, s, r, n);
+										_Ox[y + 1, x] = p[9] = store_point_normal(grid, s, r);
 									}
 								}
 								break;
@@ -823,29 +1022,48 @@ namespace MC_33
 										if (x != 0)
 										{
 											_Nx[y + 1, x] = p[10] = p[1] = _NL[x];
-											if (SignBit(v[3]) != 0) p[2] = p[10];
+											if (SignBit(v[3]) != 0)
+											{
+												p[2] = p[10];
+											}
 										}
 										else
 										{
 											_Nx[y + 1, 0] = p[10] = _NL[0] = p[1] = surfint(grid, s, 0, y + 1, z + 1, r, n);
-											if (SignBit(v[3]) != 0) _Ny[y, 0] = p[2] = p[10];
+											if (SignBit(v[3]) != 0)
+											{
+												_Ny[y, 0] = p[2] = p[10];
+											}
 										}
 									}
 									else if (SignBit(v[3]) != 0)
 									{
 										if (x != 0)
+										{
 											_Nx[y + 1, x] = p[10] = p[2] = _Ny[y, x];
+										}
 										else
+										{
 											_Nx[y + 1, 0] = p[10] = _Ny[y, 0] = p[2] = surfint(grid, s, 0, y + 1, z + 1, r, n);
+										}
 									}
 									else
+									{
 										_Nx[y + 1, x] = p[10] = surfint(grid, s, x, y + 1, z + 1, r, n);
+									}
 								}
 								else if (v[6] == 0.0f)
 								{
 									_Nx[y + 1, x] = p[10] = surfint(grid, s, x + 1, y + 1, z + 1, r, n);
-									if (SignBit(v[5]) != 0) _NL[x + 1] = p[5] = p[10];
-									if (SignBit(v[7]) != 0) _Ny[y, x + 1] = p[6] = p[10];
+									if (SignBit(v[5]) != 0)
+									{
+										_NL[x + 1] = p[5] = p[10];
+									}
+
+									if (SignBit(v[7]) != 0)
+									{
+										_Ny[y, x + 1] = p[6] = p[10];
+									}
 								}
 								else
 								{
@@ -859,30 +1077,45 @@ namespace MC_33
 									n[2] = (z + 1 < grid.SizeZ ? 0.5f * ((grid[x, y + 1, z] - grid[x, y + 1, z + 2]) * (1.0f - t)
 												+ (grid[x + 1, y + 1, z] - grid[x + 1, y + 1, z + 2]) * t) :
 												(v[2] - v[1]) * (1.0f - t) + (v[6] - v[5]) * t);
-									_Nx[y + 1, x] = p[10] = store_point_normal(grid, s, r, n);
+									_Nx[y + 1, x] = p[10] = store_point_normal(grid, s, r);
 								}
 								break;
 							case 11:
 								if (y != 0)
+								{
 									p[11] = _Nx[y, x];
+								}
 								else
 								{
 									if (v[3] == 0.0f)
 									{
 										_Nx[0, x] = p[11] = surfint(grid, s, x, 0, z + 1, r, n);
-										if (SignBit(v[0]) != 0) p[3] = p[11];
+										if (SignBit(v[0]) != 0)
+										{
+											p[3] = p[11];
+										}
+
 										if (SignBit(v[2]) != 0)
 										{
 											p[2] = p[11];
 											if (x == 0)
+											{
 												_Ny[0, 0] = p[2];
+											}
 										}
 									}
 									else if (v[7] == 0.0f)
 									{
 										_Nx[0, x] = p[11] = surfint(grid, s, x + 1, 0, z + 1, r, n);
-										if (SignBit(v[4]) != 0) _OL[x + 1] = p[7] = p[11];
-										if (SignBit(v[6]) != 0) _Ny[0, x + 1] = p[6] = p[11];
+										if (SignBit(v[4]) != 0)
+										{
+											_OL[x + 1] = p[7] = p[11];
+										}
+
+										if (SignBit(v[6]) != 0)
+										{
+											_Ny[0, x + 1] = p[6] = p[11];
+										}
 									}
 									else
 									{
@@ -894,7 +1127,7 @@ namespace MC_33
 										n[2] = (z + 1 < grid.SizeZ ? 0.5f * ((grid[x, 0, z] - grid[x, 0, z + 2]) * (1.0f - t)
 													+ (grid[x + 1, 0, z] - grid[x + 1, 0, z + 2]) * t) :
 													(v[3] - v[0]) * (1.0f - t) + (v[7] - v[4]) * t);
-										_Nx[0, x] = p[11] = store_point_normal(grid, s, r, n);
+										_Nx[0, x] = p[11] = store_point_normal(grid, s, r);
 									}
 								}
 								break;
@@ -903,7 +1136,7 @@ namespace MC_33
 								n[0] = v[4] + v[5] + v[6] + v[7] - v[0] - v[1] - v[2] - v[3];
 								n[1] = v[1] + v[2] + v[5] + v[6] - v[0] - v[3] - v[4] - v[7];
 								n[2] = v[2] + v[3] + v[6] + v[7] - v[0] - v[1] - v[4] - v[5];
-								p[12] = store_point_normal(grid, s, r, n);
+								p[12] = store_point_normal(grid, s, r);
 								break;
 						}
 					}
@@ -912,7 +1145,7 @@ namespace MC_33
 				if (f[0] != f[1] && f[0] != f[2] && f[1] != f[2])//to avoid zero area triangles
 				{
 					if (m != 0)//The order of triangle vertices is reversed if m is not zero
-						{ f[2] = f[0]; f[0] = p[c]; }
+					{ f[2] = f[0]; f[0] = p[c]; }
 					store_triangle(s, f);
 				}
 			}
@@ -924,10 +1157,7 @@ namespace MC_33
 			int nx = grid.SizeX;
 			int ny = grid.SizeY;
 			int nz = grid.SizeZ;
-			int i = 0;
-			//GRD_data_type*** F = _MC_F, **F0, **F1, *V00, *V01, *V11, *V10;
 			float[] vs = new float[8];
-			//float[] v2 = new float[8];
 			int[] _OL = new int[nx + 1];
 			int[] _NL = new int[nx + 1];
 			int[,] _Oy = new int[ny, nx + 1];
@@ -937,25 +1167,15 @@ namespace MC_33
 			Surface surface = new ListSurface();
 			for (z = 0; z < nz; z++)
 			{
-				//D[][] F0 = *F;
-				//D[][] F1 = *(++F);
 				for (y = 0; y < ny; y++)
 				{
-					//D[] V00 = *F0;
-					//D[] V01 = *(++F0);
-					//D[] V10 = *F1;
-					//D[] V11 = *(++F1);
-					//v2[0] = iso - *V00;//the difference was inverted to use signbit function
-					//v2[1] = iso - *V01;
-					//v2[2] = iso - *V11;
-					//v2[3] = iso - *V10;
 					vs[4] = iso - grid[0, y, z];
 					vs[5] = iso - grid[0, y + 1, z];
 					vs[6] = iso - grid[0, y + 1, z + 1];
 					vs[7] = iso - grid[0, y, z + 1];
 					//the eight least significant bits of i correspond to vertex indices. (x...x01234567)
 					//If the bit is 1 then the vertex value is greater than zero.
-					i = (((((SignBit(vs[4]) << 1) | SignBit(vs[5])) << 1) | SignBit(vs[6])) << 1) | SignBit(vs[7]);
+					int i = (((((SignBit(vs[4]) << 1) | SignBit(vs[5])) << 1) | SignBit(vs[6])) << 1) | SignBit(vs[7]);
 					for (x = 0; x < nx; x++)
 					{
 						vs[0] = vs[4];
@@ -963,10 +1183,6 @@ namespace MC_33
 						vs[2] = vs[6];
 						vs[3] = vs[7];
 
-						//v2[0] = iso - *(++V00);
-						//v2[1] = iso - *(++V01);
-						//v2[2] = iso - *(++V11);
-						//v2[3] = iso - *(++V10);
 						vs[4] = iso - grid[x + 1, y, z];
 						vs[5] = iso - grid[x + 1, y + 1, z];
 						vs[6] = iso - grid[x + 1, y + 1, z + 1];
@@ -974,7 +1190,6 @@ namespace MC_33
 						i = ((((((((i & 0x0F) << 1) | SignBit(vs[4])) << 1) | SignBit(vs[5])) << 1) | SignBit(vs[6])) << 1) | SignBit(vs[7]);
 						if (i != 0 && i != 0xFF)//i is different from 0 and 0xFF
 						{
-							//if (v1 > v2) memcpy(v1 + 4, v2, 4 * sizeof(float));
 							find_case(grid, surface, x, y, z, i, vs, _OL, _NL, _Oy, _Ny, _Ox, _Nx);
 						}
 					}
@@ -993,14 +1208,5 @@ namespace MC_33
 			}
 			return surface;
 		}
-
-		//static Surface calculate_isosurface(Grid grd, float iso)
-		//{
-		//	if (init_temp_isosurface(grd))
-		//		return 0;
-		//	calc_isosurface(iso);
-		//	clear_temp_isosurface( != 0);
-		//	return surface;
-		//}
 	}
 }

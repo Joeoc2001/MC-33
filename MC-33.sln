@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MC-33", "MC-33\MC-33.csproj", "{407E60F0-C5B3-4900-913A-39C3817363C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MC-33", "MC-33\MC-33.csproj", "{407E60F0-C5B3-4900-913A-39C3817363C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MC-33-Tests", "MC-33-Tests\MC-33-Tests.csproj", "{CC232F1F-461E-4A7D-B7CD-34D80C377207}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MC-33.Test", "MC-33.Test\MC-33.Test.csproj", "{CC232F1F-461E-4A7D-B7CD-34D80C377207}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
