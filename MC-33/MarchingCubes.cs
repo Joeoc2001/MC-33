@@ -9,7 +9,7 @@ namespace MC_33
 
 		private static int SignBit(float i)
 		{
-			return Math.Sign(i) < 0 ? 1 : 0;
+			return i < 0 ? 1 : 0;
 		}
 
 		/******************************************************************
@@ -47,13 +47,13 @@ namespace MC_33
 			{
 				face[1] = ((ind & 0x66) == 0x42 ? (v[1] * v[6] < v[2] * v[5] ? -sw : sw) : 0);//0x42 = 01000010, vertices 1 and 6
 				face[2] = ((ind & 0x33) == 0x12 ? (v[3] * v[6] < v[2] * v[7] ? -sw : sw) : 0);//0x12 = 00010010, vertices 3 and 6
-				face[5] = ((ind & 0) == 0x0A ? (v[4] * v[6] < v[5] * v[7] ? -sw : sw) : 0);//0x0A = 00001010, vertices 4 and 6
+				face[5] = ((ind & 0x0F) == 0x0A ? (v[4] * v[6] < v[5] * v[7] ? -sw : sw) : 0);//0x0A = 00001010, vertices 4 and 6
 			}
 			else
 			{
 				face[1] = ((ind & 0x66) == 0x24 ? (v[1] * v[6] < v[2] * v[5] ? sw : -sw) : 0);//0x24 = 00100100, vertices 2 and 5
 				face[2] = ((ind & 0x33) == 0x21 ? (v[3] * v[6] < v[2] * v[7] ? sw : -sw) : 0);//0x21 = 00100001, vertices 2 and 7
-				face[5] = ((ind & 0) == 0x05 ? (v[4] * v[6] < v[5] * v[7] ? sw : -sw) : 0);//0x05 = 00000101, vertices 5 and 7
+				face[5] = ((ind & 0x0F) == 0x05 ? (v[4] * v[6] < v[5] * v[7] ? sw : -sw) : 0);//0x05 = 00000101, vertices 5 and 7
 			}
 			return face[0] + face[1] + face[2] + face[3] + face[4] + face[5];
 		}
@@ -426,7 +426,7 @@ namespace MC_33
 				ushort j = caseItem;
 				for (k = 0; k < 3; ++k)
 				{
-					caseCode = j & 0;
+					caseCode = j & 0x0F;
 					j >>= 4;
 					if (pointIndices[caseCode] < 0)
 					{
@@ -1054,7 +1054,7 @@ namespace MC_33
 			vertices[6] = iso - grid[x, y + 1, z + 1];
 			vertices[7] = iso - grid[x, y, z + 1];
 
-			return ((((((((oldI & 0) << 1) | SignBit(vertices[4])) << 1) | SignBit(vertices[5])) << 1) | SignBit(vertices[6])) << 1) | SignBit(vertices[7]);
+			return ((((((((oldI & 0x0F) << 1) | SignBit(vertices[4])) << 1) | SignBit(vertices[5])) << 1) | SignBit(vertices[6])) << 1) | SignBit(vertices[7]);
 		}
 
 		public static Surface CalculateSurface(Grid grid, float iso)
