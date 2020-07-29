@@ -343,6 +343,577 @@ namespace MC_33
 			}
 		}
 
+		static int GetPointIndex(Grid grid, Surface surface, int caseCode, ref int[] pointIndices, int x, int y, int z, float[] cell,
+			int[] oldLayer, int[] newLayer, int[,] oldY, int[,] newY, int[,] oldX, int[,] newX)
+		{
+			if (pointIndices[caseCode] < 0)
+			{
+				switch (caseCode)
+				{
+					case 0:
+						if (z != 0 || x != 0)
+						{
+							pointIndices[0] = oldY[y, x];
+						}
+						else
+						{
+							if (cell[0] == 0)
+							{
+								pointIndices[0] = StorePoint(grid, surface, 0, y, 0);
+								if (SignBit(cell[3]) != 0)
+								{
+									pointIndices[3] = pointIndices[0];
+								}
+
+								if (SignBit(cell[4]) != 0)
+								{
+									pointIndices[8] = pointIndices[0];
+								}
+							}
+							else if (cell[1] == 0)
+							{
+								pointIndices[0] = StorePoint(grid, surface, 0, y + 1, 0);
+								if (SignBit(cell[2]) != 0)
+								{
+									newLayer[0] = pointIndices[1] = pointIndices[0];
+								}
+
+								if (SignBit(cell[5]) != 0)
+								{
+									oldX[y + 1, 0] = pointIndices[9] = pointIndices[0];
+								}
+							}
+							else
+							{
+								float t = cell[0] / (cell[0] - cell[1]);
+								pointIndices[0] = StorePoint(grid, surface, 0, y + t, 0);
+							}
+						}
+						break;
+					case 1:
+						if (x != 0)
+						{
+							pointIndices[1] = newLayer[x];
+						}
+						else
+						{
+							if (cell[1] == 0)
+							{
+								newLayer[0] = pointIndices[1] = StorePoint(grid, surface, 0, y + 1, z);
+								if (SignBit(cell[0]) != 0)
+								{
+									pointIndices[0] = pointIndices[1];
+								}
+
+								if (SignBit(cell[5]) != 0)
+								{
+									pointIndices[9] = pointIndices[1];
+									if (z == 0)
+									{
+										oldX[y + 1, 0] = pointIndices[9];
+									}
+								}
+							}
+							else if (cell[2] == 0)
+							{
+								newLayer[0] = pointIndices[1] = StorePoint(grid, surface, 0, y + 1, z + 1);
+								if (SignBit(cell[3]) != 0)
+								{
+									newY[y, 0] = pointIndices[2] = pointIndices[1];
+								}
+
+								if (SignBit(cell[6]) != 0)
+								{
+									newX[y + 1, 0] = pointIndices[10] = pointIndices[1];
+								}
+							}
+							else
+							{
+								float t = cell[1] / (cell[1] - cell[2]);
+								newLayer[0] = pointIndices[1] = StorePoint(grid, surface, 0, y + 1, z + t);
+							}
+						}
+						break;
+					case 2:
+						if (x != 0)
+						{
+							pointIndices[2] = newY[y, x];
+						}
+						else
+						{
+							if (cell[3] == 0)
+							{
+								newY[y, 0] = pointIndices[2] = StorePoint(grid, surface, 0, y, z + 1);
+								if (SignBit(cell[0]) != 0)
+								{
+									pointIndices[3] = pointIndices[2];
+								}
+
+								if (SignBit(cell[7]) != 0)
+								{
+									pointIndices[11] = pointIndices[2];
+									if (y == 0)
+									{
+										newX[0, 0] = pointIndices[11];
+									}
+								}
+							}
+							else if (cell[2] == 0)
+							{
+								newY[y, 0] = pointIndices[2] = StorePoint(grid, surface, 0, y + 1, z + 1);
+								if (SignBit(cell[1]) != 0)
+								{
+									newLayer[0] = pointIndices[1] = pointIndices[2];
+								}
+
+								if (SignBit(cell[6]) != 0)
+								{
+									newX[y + 1, 0] = pointIndices[10] = pointIndices[2];
+								}
+							}
+							else
+							{
+								float t = cell[3] / (cell[3] - cell[2]);
+								newY[y, 0] = pointIndices[2] = StorePoint(grid, surface, 0, y + t, z + 1);
+							}
+						}
+						break;
+					case 3:
+						if (y != 0 || x != 0)
+						{
+							pointIndices[3] = oldLayer[x];
+						}
+						else
+						{
+							if (cell[0] == 0)
+							{
+								pointIndices[3] = StorePoint(grid, surface, 0, 0, z);
+								if (SignBit(cell[1]) != 0)
+								{
+									pointIndices[0] = pointIndices[3];
+								}
+
+								if (SignBit(cell[4]) != 0)
+								{
+									pointIndices[8] = pointIndices[3];
+								}
+							}
+							else if (cell[3] == 0)
+							{
+								pointIndices[3] = StorePoint(grid, surface, 0, 0, z + 1);
+								if (SignBit(cell[2]) != 0)
+								{
+									newY[0, 0] = pointIndices[2] = pointIndices[3];
+								}
+
+								if (SignBit(cell[7]) != 0)
+								{
+									newX[0, 0] = pointIndices[11] = pointIndices[3];
+								}
+							}
+							else
+							{
+								float t = cell[0] / (cell[0] - cell[3]);
+								pointIndices[3] = StorePoint(grid, surface, 0, 0, z + t);
+							}
+						}
+						break;
+					case 4:
+						if (z != 0)
+						{
+							pointIndices[4] = oldY[y, x + 1];
+						}
+						else
+						{
+							if (cell[4] == 0)
+							{
+								oldY[y, x + 1] = pointIndices[4] = StorePoint(grid, surface, x + 1, y, 0);
+								if (SignBit(cell[7]) != 0)
+								{
+									pointIndices[7] = pointIndices[4];
+								}
+
+								if (SignBit(cell[0]) != 0)
+								{
+									pointIndices[8] = pointIndices[4];
+								}
+
+								if (y == 0)
+								{
+									oldLayer[x + 1] = pointIndices[7];
+								}
+							}
+							else if (cell[5] == 0)
+							{
+								oldY[y, x + 1] = pointIndices[4] = StorePoint(grid, surface, x + 1, y + 1, 0);
+								if (SignBit(cell[6]) != 0)
+								{
+									newLayer[x + 1] = pointIndices[5] = pointIndices[4];
+								}
+
+								if (SignBit(cell[1]) != 0)
+								{
+									oldX[y + 1, x] = pointIndices[9] = pointIndices[4];
+								}
+							}
+							else
+							{
+								float t = cell[4] / (cell[4] - cell[5]);
+								oldY[y, x + 1] = pointIndices[4] = StorePoint(grid, surface, x + 1, y + t, 0);
+							}
+						}
+						break;
+					case 5:
+						if (cell[5] == 0)
+						{
+							if (SignBit(cell[4]) != 0)
+							{
+								if (z != 0)
+								{
+									newLayer[x + 1] = pointIndices[5] = pointIndices[4] = oldY[y, x + 1];
+									if (SignBit(cell[1]) != 0)
+									{
+										pointIndices[9] = pointIndices[5];
+									}
+								}
+								else
+								{
+									newLayer[x + 1] = pointIndices[5] = oldY[y, x + 1] = pointIndices[4] = StorePoint(grid, surface, x + 1, y + 1, 0);
+									if (SignBit(cell[1]) != 0)
+									{
+										oldX[y + 1, x] = pointIndices[9] = pointIndices[5];
+									}
+								}
+							}
+							else if (SignBit(cell[1]) != 0)
+							{
+								if (z != 0)
+								{
+									newLayer[x + 1] = pointIndices[5] = pointIndices[9] = oldX[y + 1, x];
+								}
+								else
+								{
+									newLayer[x + 1] = pointIndices[5] = oldX[y + 1, x] = pointIndices[9] = StorePoint(grid, surface, x + 1, y + 1, 0);
+								}
+							}
+							else
+							{
+								newLayer[x + 1] = pointIndices[5] = StorePoint(grid, surface, x + 1, y + 1, z);
+							}
+						}
+						else if (cell[6] == 0)
+						{
+							newLayer[x + 1] = pointIndices[5] = StorePoint(grid, surface, x + 1, y + 1, z + 1);
+							if (SignBit(cell[2]) != 0)
+							{
+								newX[y + 1, x] = pointIndices[10] = pointIndices[5];
+							}
+
+							if (SignBit(cell[7]) != 0)
+							{
+								newY[y, x + 1] = pointIndices[6] = pointIndices[5];
+							}
+						}
+						else
+						{
+							float t = cell[5] / (cell[5] - cell[6]);
+							newLayer[x + 1] = pointIndices[5] = StorePoint(grid, surface, x + 1, y + 1, z + t);
+						}
+						break;
+					case 6:
+						if (cell[7] == 0)
+						{
+							if (SignBit(cell[3]) != 0)
+							{
+								if (y != 0)
+								{
+									newY[y, x + 1] = pointIndices[6] = pointIndices[11] = newX[y, x];
+									if (SignBit(cell[4]) != 0)
+									{
+										pointIndices[7] = pointIndices[6];
+									}
+								}
+								else
+								{
+									newY[y, x + 1] = pointIndices[6] = newX[0, x] = pointIndices[11] = StorePoint(grid, surface, x + 1, 0, z + 1);
+									if (SignBit(cell[4]) != 0)
+									{
+										oldLayer[x + 1] = pointIndices[7] = pointIndices[6];
+									}
+								}
+							}
+							else if (SignBit(cell[4]) != 0)
+							{
+								if (y != 0)
+								{
+									newY[y, x + 1] = pointIndices[6] = pointIndices[7] = oldLayer[x + 1];
+								}
+								else
+								{
+									newY[y, x + 1] = pointIndices[6] = oldLayer[x + 1] = pointIndices[7] = StorePoint(grid, surface, x + 1, 0, z + 1);
+								}
+							}
+							else
+							{
+								newY[y, x + 1] = pointIndices[6] = StorePoint(grid, surface, x + 1, y, z + 1);
+							}
+						}
+						else if (cell[6] == 0)
+						{
+							newY[y, x + 1] = pointIndices[6] = StorePoint(grid, surface, x + 1, y + 1, z + 1);
+							if (SignBit(cell[5]) != 0)
+							{
+								newLayer[x + 1] = pointIndices[5] = pointIndices[6];
+							}
+
+							if (SignBit(cell[2]) != 0)
+							{
+								newX[y + 1, x] = pointIndices[10] = pointIndices[6];
+							}
+						}
+						else
+						{
+							float t = cell[7] / (cell[7] - cell[6]);
+							newY[y, x + 1] = pointIndices[6] = StorePoint(grid, surface, x + 1, y + t, z + 1);
+						}
+						break;
+					case 7:
+						if (y != 0)
+						{
+							pointIndices[7] = oldLayer[x + 1];
+						}
+						else
+						{
+							if (cell[4] == 0)
+							{
+								oldLayer[x + 1] = pointIndices[7] = StorePoint(grid, surface, x + 1, 0, z);
+								if (SignBit(cell[0]) != 0)
+								{
+									pointIndices[8] = pointIndices[7];
+								}
+
+								if (SignBit(cell[5]) != 0)
+								{
+									pointIndices[4] = pointIndices[7];
+									if (z == 0)
+									{
+										oldY[0, x + 1] = pointIndices[4];
+									}
+								}
+							}
+							else if (cell[7] == 0)
+							{
+								oldLayer[x + 1] = pointIndices[7] = StorePoint(grid, surface, x + 1, 0, z + 1);
+								if (SignBit(cell[6]) != 0)
+								{
+									newY[0, x + 1] = pointIndices[6] = pointIndices[7];
+								}
+
+								if (SignBit(cell[3]) != 0)
+								{
+									newX[0, x] = pointIndices[11] = pointIndices[7];
+								}
+							}
+							else
+							{
+								float t = cell[4] / (cell[4] - cell[7]);
+								oldLayer[x + 1] = pointIndices[7] = StorePoint(grid, surface, x + 1, 0, z + t);
+							}
+						}
+						break;
+					case 8:
+						if (z != 0 || y != 0)
+						{
+							pointIndices[8] = oldX[y, x];
+						}
+						else
+						{
+							if (cell[0] == 0)
+							{
+								pointIndices[8] = StorePoint(grid, surface, x, 0, 0);
+								if (SignBit(cell[1]) != 0)
+								{
+									pointIndices[0] = pointIndices[8];
+								}
+
+								if (SignBit(cell[3]) != 0)
+								{
+									pointIndices[3] = pointIndices[8];
+								}
+							}
+							else if (cell[4] == 0)
+							{
+								pointIndices[8] = StorePoint(grid, surface, x + 1, 0, 0);
+								if (SignBit(cell[5]) != 0)
+								{
+									oldY[0, x + 1] = pointIndices[4] = pointIndices[8];
+								}
+
+								if (SignBit(cell[7]) != 0)
+								{
+									oldLayer[x + 1] = pointIndices[7] = pointIndices[8];
+								}
+							}
+							else
+							{
+								float t = cell[0] / (cell[0] - cell[4]);
+								pointIndices[8] = StorePoint(grid, surface, x + t, 0, 0);
+							}
+						}
+						break;
+					case 9:
+						if (z != 0)
+						{
+							pointIndices[9] = oldX[y + 1, x];
+						}
+						else
+						{
+							if (cell[1] == 0)
+							{
+								oldX[y + 1, x] = pointIndices[9] = StorePoint(grid, surface, x, y + 1, 0);
+								if (SignBit(cell[2]) != 0)
+								{
+									pointIndices[1] = pointIndices[9];
+									if (x == 0)
+									{
+										newLayer[0] = pointIndices[1];
+									}
+								}
+								if (SignBit(cell[0]) != 0)
+								{
+									pointIndices[0] = pointIndices[9];
+								}
+							}
+							else if (cell[5] == 0)
+							{
+								oldX[y + 1, x] = pointIndices[9] = StorePoint(grid, surface, x + 1, y + 1, 0);
+								if (SignBit(cell[6]) != 0)
+								{
+									newLayer[x + 1] = pointIndices[5] = pointIndices[9];
+								}
+
+								if (SignBit(cell[4]) != 0)
+								{
+									oldY[y, x + 1] = pointIndices[4] = pointIndices[9];
+								}
+							}
+							else
+							{
+								float t = cell[1] / (cell[1] - cell[5]);
+								oldX[y + 1, x] = pointIndices[9] = StorePoint(grid, surface, x + t, y + 1, 0);
+							}
+						}
+						break;
+					case 10:
+						if (cell[2] == 0)
+						{
+							if (SignBit(cell[1]) != 0)
+							{
+								if (x != 0)
+								{
+									newX[y + 1, x] = pointIndices[10] = pointIndices[1] = newLayer[x];
+									if (SignBit(cell[3]) != 0)
+									{
+										pointIndices[2] = pointIndices[10];
+									}
+								}
+								else
+								{
+									newX[y + 1, 0] = pointIndices[10] = newLayer[0] = pointIndices[1] = StorePoint(grid, surface, 0, y + 1, z + 1);
+									if (SignBit(cell[3]) != 0)
+									{
+										newY[y, 0] = pointIndices[2] = pointIndices[10];
+									}
+								}
+							}
+							else if (SignBit(cell[3]) != 0)
+							{
+								if (x != 0)
+								{
+									newX[y + 1, x] = pointIndices[10] = pointIndices[2] = newY[y, x];
+								}
+								else
+								{
+									newX[y + 1, 0] = pointIndices[10] = newY[y, 0] = pointIndices[2] = StorePoint(grid, surface, 0, y + 1, z + 1);
+								}
+							}
+							else
+							{
+								newX[y + 1, x] = pointIndices[10] = StorePoint(grid, surface, x, y + 1, z + 1);
+							}
+						}
+						else if (cell[6] == 0)
+						{
+							newX[y + 1, x] = pointIndices[10] = StorePoint(grid, surface, x + 1, y + 1, z + 1);
+							if (SignBit(cell[5]) != 0)
+							{
+								newLayer[x + 1] = pointIndices[5] = pointIndices[10];
+							}
+
+							if (SignBit(cell[7]) != 0)
+							{
+								newY[y, x + 1] = pointIndices[6] = pointIndices[10];
+							}
+						}
+						else
+						{
+							float t = cell[2] / (cell[2] - cell[6]);
+							newX[y + 1, x] = pointIndices[10] = StorePoint(grid, surface, x + t, y + 1, z + 1);
+						}
+						break;
+					case 11:
+						if (y != 0)
+						{
+							pointIndices[11] = newX[y, x];
+						}
+						else
+						{
+							if (cell[3] == 0)
+							{
+								newX[0, x] = pointIndices[11] = StorePoint(grid, surface, x, 0, z + 1);
+								if (SignBit(cell[0]) != 0)
+								{
+									pointIndices[3] = pointIndices[11];
+								}
+
+								if (SignBit(cell[2]) != 0)
+								{
+									pointIndices[2] = pointIndices[11];
+									if (x == 0)
+									{
+										newY[0, 0] = pointIndices[2];
+									}
+								}
+							}
+							else if (cell[7] == 0)
+							{
+								newX[0, x] = pointIndices[11] = StorePoint(grid, surface, x + 1, 0, z + 1);
+								if (SignBit(cell[4]) != 0)
+								{
+									oldLayer[x + 1] = pointIndices[7] = pointIndices[11];
+								}
+
+								if (SignBit(cell[6]) != 0)
+								{
+									newY[0, x + 1] = pointIndices[6] = pointIndices[11];
+								}
+							}
+							else
+							{
+								float t = cell[3] / (cell[3] - cell[7]);
+								newX[0, x] = pointIndices[11] = StorePoint(grid, surface, x + t, 0, z + 1);
+							}
+						}
+						break;
+					case 12:
+						pointIndices[12] = StorePoint(grid, surface, x + 0.5f, y + 0.5f, z + 0.5f);
+						break;
+				}
+			}
+
+			return pointIndices[caseCode];
+		}
+
 		/******************************************************************
 		This function find the MC33 case (using the index i, and the face and interior
 		tests). The correct triangle pattern is obtained from the arrays contained in
@@ -363,10 +934,7 @@ namespace MC_33
 		static void FindCase(Grid grid, Surface surface, int x, int y, int z, int i, float[] cell,
 			int[] oldLayer, int[] newLayer, int[,] oldY, int[,] newY, int[,] oldX, int[,] newX)
 		{
-			float t;
-			float[] point = new float[3];
 			int vertexIndex;
-			int[] pointIndices = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 			bool reverseTriangles = (i & 0x80) > 0;
 
 			int caseCode = LookUpTable.Case_Index[!reverseTriangles ? i : i ^ 0xFF];
@@ -381,615 +949,16 @@ namespace MC_33
 
 			ushort[] casePoints = GetCasePoints(i, cell, mc33Case, subCase, lowestCaseBit, reverseTriangles);
 
-			int[] triangle = new int[3];
-
+			int[] pointIndices = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
 			foreach (ushort caseItem in casePoints)
 			{
+				int[] triangle = new int[3];
 				for (vertexIndex = 0; vertexIndex < 3; ++vertexIndex)
 				{
 					caseCode = (caseItem >> (4 * vertexIndex)) & 0x0F;
 
-					if (pointIndices[caseCode] < 0)
-					{
-						switch (caseCode)//the vertices r[3] and normals n[3] are calculated here
-						{
-							case 0:
-								if (z != 0 || x != 0)
-								{
-									pointIndices[0] = oldY[y, x];
-								}
-								else
-								{
-									if (cell[0] == 0)
-									{
-										pointIndices[0] = StorePoint(grid, surface, 0, y, 0);
-										if (SignBit(cell[3]) != 0)
-										{
-											pointIndices[3] = pointIndices[0];
-										}
 
-										if (SignBit(cell[4]) != 0)
-										{
-											pointIndices[8] = pointIndices[0];
-										}
-									}
-									else if (cell[1] == 0)
-									{
-										pointIndices[0] = StorePoint(grid, surface, 0, y + 1, 0);
-										if (SignBit(cell[2]) != 0)
-										{
-											newLayer[0] = pointIndices[1] = pointIndices[0];
-										}
-
-										if (SignBit(cell[5]) != 0)
-										{
-											oldX[y + 1, 0] = pointIndices[9] = pointIndices[0];
-										}
-									}
-									else
-									{
-										t = cell[0] / (cell[0] - cell[1]);
-										point[0] = point[2] = 0;
-										point[1] = y + t;
-										pointIndices[0] = StorePoint(grid, surface, point);
-									}
-								}
-								break;
-							case 1:
-								if (x != 0)
-								{
-									pointIndices[1] = newLayer[x];
-								}
-								else
-								{
-									if (cell[1] == 0)
-									{
-										newLayer[0] = pointIndices[1] = StorePoint(grid, surface, 0, y + 1, z);
-										if (SignBit(cell[0]) != 0)
-										{
-											pointIndices[0] = pointIndices[1];
-										}
-
-										if (SignBit(cell[5]) != 0)
-										{
-											pointIndices[9] = pointIndices[1];
-											if (z == 0)
-											{
-												oldX[y + 1, 0] = pointIndices[9];
-											}
-										}
-									}
-									else if (cell[2] == 0)
-									{
-										newLayer[0] = pointIndices[1] = StorePoint(grid, surface, 0, y + 1, z + 1);
-										if (SignBit(cell[3]) != 0)
-										{
-											newY[y, 0] = pointIndices[2] = pointIndices[1];
-										}
-
-										if (SignBit(cell[6]) != 0)
-										{
-											newX[y + 1, 0] = pointIndices[10] = pointIndices[1];
-										}
-									}
-									else
-									{
-										t = cell[1] / (cell[1] - cell[2]);
-										point[0] = 0;
-										point[1] = y + 1;
-										point[2] = z + t;
-										newLayer[0] = pointIndices[1] = StorePoint(grid, surface, point);
-									}
-								}
-								break;
-							case 2:
-								if (x != 0)
-								{
-									pointIndices[2] = newY[y, x];
-								}
-								else
-								{
-									if (cell[3] == 0)
-									{
-										newY[y, 0] = pointIndices[2] = StorePoint(grid, surface, 0, y, z + 1);
-										if (SignBit(cell[0]) != 0)
-										{
-											pointIndices[3] = pointIndices[2];
-										}
-
-										if (SignBit(cell[7]) != 0)
-										{
-											pointIndices[11] = pointIndices[2];
-											if (y == 0)
-											{
-												newX[0, 0] = pointIndices[11];
-											}
-										}
-									}
-									else if (cell[2] == 0)
-									{
-										newY[y, 0] = pointIndices[2] = StorePoint(grid, surface, 0, y + 1, z + 1);
-										if (SignBit(cell[1]) != 0)
-										{
-											newLayer[0] = pointIndices[1] = pointIndices[2];
-										}
-
-										if (SignBit(cell[6]) != 0)
-										{
-											newX[y + 1, 0] = pointIndices[10] = pointIndices[2];
-										}
-									}
-									else
-									{
-										t = cell[3] / (cell[3] - cell[2]);
-										point[0] = 0;
-										point[2] = z + 1;
-										point[1] = y + t;
-										newY[y, 0] = pointIndices[2] = StorePoint(grid, surface, point);
-									}
-								}
-								break;
-							case 3:
-								if (y != 0 || x != 0)
-								{
-									pointIndices[3] = oldLayer[x];
-								}
-								else
-								{
-									if (cell[0] == 0)
-									{
-										pointIndices[3] = StorePoint(grid, surface, 0, 0, z);
-										if (SignBit(cell[1]) != 0)
-										{
-											pointIndices[0] = pointIndices[3];
-										}
-
-										if (SignBit(cell[4]) != 0)
-										{
-											pointIndices[8] = pointIndices[3];
-										}
-									}
-									else if (cell[3] == 0)
-									{
-										pointIndices[3] = StorePoint(grid, surface, 0, 0, z + 1);
-										if (SignBit(cell[2]) != 0)
-										{
-											newY[0, 0] = pointIndices[2] = pointIndices[3];
-										}
-
-										if (SignBit(cell[7]) != 0)
-										{
-											newX[0, 0] = pointIndices[11] = pointIndices[3];
-										}
-									}
-									else
-									{
-										t = cell[0] / (cell[0] - cell[3]);
-										point[0] = point[1] = 0;
-										point[2] = z + t;
-										pointIndices[3] = StorePoint(grid, surface, point);
-									}
-								}
-								break;
-							case 4:
-								if (z != 0)
-								{
-									pointIndices[4] = oldY[y, x + 1];
-								}
-								else
-								{
-									if (cell[4] == 0)
-									{
-										oldY[y, x + 1] = pointIndices[4] = StorePoint(grid, surface, x + 1, y, 0);
-										if (SignBit(cell[7]) != 0)
-										{
-											pointIndices[7] = pointIndices[4];
-										}
-
-										if (SignBit(cell[0]) != 0)
-										{
-											pointIndices[8] = pointIndices[4];
-										}
-
-										if (y == 0)
-										{
-											oldLayer[x + 1] = pointIndices[7];
-										}
-									}
-									else if (cell[5] == 0)
-									{
-										oldY[y, x + 1] = pointIndices[4] = StorePoint(grid, surface, x + 1, y + 1, 0);
-										if (SignBit(cell[6]) != 0)
-										{
-											newLayer[x + 1] = pointIndices[5] = pointIndices[4];
-										}
-
-										if (SignBit(cell[1]) != 0)
-										{
-											oldX[y + 1, x] = pointIndices[9] = pointIndices[4];
-										}
-									}
-									else
-									{
-										t = cell[4] / (cell[4] - cell[5]);
-										point[0] = x + 1;
-										point[2] = 0;
-										point[1] = y + t;
-										oldY[y, x + 1] = pointIndices[4] = StorePoint(grid, surface, point);
-									}
-								}
-								break;
-							case 5:
-								if (cell[5] == 0)
-								{
-									if (SignBit(cell[4]) != 0)
-									{
-										if (z != 0)
-										{
-											newLayer[x + 1] = pointIndices[5] = pointIndices[4] = oldY[y, x + 1];
-											if (SignBit(cell[1]) != 0)
-											{
-												pointIndices[9] = pointIndices[5];
-											}
-										}
-										else
-										{
-											newLayer[x + 1] = pointIndices[5] = oldY[y, x + 1] = pointIndices[4] = StorePoint(grid, surface, x + 1, y + 1, 0);
-											if (SignBit(cell[1]) != 0)
-											{
-												oldX[y + 1, x] = pointIndices[9] = pointIndices[5];
-											}
-										}
-									}
-									else if (SignBit(cell[1]) != 0)
-									{
-										if (z != 0)
-										{
-											newLayer[x + 1] = pointIndices[5] = pointIndices[9] = oldX[y + 1, x];
-										}
-										else
-										{
-											newLayer[x + 1] = pointIndices[5] = oldX[y + 1, x] = pointIndices[9] = StorePoint(grid, surface, x + 1, y + 1, 0);
-										}
-									}
-									else
-									{
-										newLayer[x + 1] = pointIndices[5] = StorePoint(grid, surface, x + 1, y + 1, z);
-									}
-								}
-								else if (cell[6] == 0)
-								{
-									newLayer[x + 1] = pointIndices[5] = StorePoint(grid, surface, x + 1, y + 1, z + 1);
-									if (SignBit(cell[2]) != 0)
-									{
-										newX[y + 1, x] = pointIndices[10] = pointIndices[5];
-									}
-
-									if (SignBit(cell[7]) != 0)
-									{
-										newY[y, x + 1] = pointIndices[6] = pointIndices[5];
-									}
-								}
-								else
-								{
-									t = cell[5] / (cell[5] - cell[6]);
-									point[0] = x + 1;
-									point[1] = y + 1;
-									point[2] = z + t;
-									newLayer[x + 1] = pointIndices[5] = StorePoint(grid, surface, point);
-								}
-								break;
-							case 6:
-								if (cell[7] == 0)
-								{
-									if (SignBit(cell[3]) != 0)
-									{
-										if (y != 0)
-										{
-											newY[y, x + 1] = pointIndices[6] = pointIndices[11] = newX[y, x];
-											if (SignBit(cell[4]) != 0)
-											{
-												pointIndices[7] = pointIndices[6];
-											}
-										}
-										else
-										{
-											newY[y, x + 1] = pointIndices[6] = newX[0, x] = pointIndices[11] = StorePoint(grid, surface, x + 1, 0, z + 1);
-											if (SignBit(cell[4]) != 0)
-											{
-												oldLayer[x + 1] = pointIndices[7] = pointIndices[6];
-											}
-										}
-									}
-									else if (SignBit(cell[4]) != 0)
-									{
-										if (y != 0)
-										{
-											newY[y, x + 1] = pointIndices[6] = pointIndices[7] = oldLayer[x + 1];
-										}
-										else
-										{
-											newY[y, x + 1] = pointIndices[6] = oldLayer[x + 1] = pointIndices[7] = StorePoint(grid, surface, x + 1, 0, z + 1);
-										}
-									}
-									else
-									{
-										newY[y, x + 1] = pointIndices[6] = StorePoint(grid, surface, x + 1, y, z + 1);
-									}
-								}
-								else if (cell[6] == 0)
-								{
-									newY[y, x + 1] = pointIndices[6] = StorePoint(grid, surface, x + 1, y + 1, z + 1);
-									if (SignBit(cell[5]) != 0)
-									{
-										newLayer[x + 1] = pointIndices[5] = pointIndices[6];
-									}
-
-									if (SignBit(cell[2]) != 0)
-									{
-										newX[y + 1, x] = pointIndices[10] = pointIndices[6];
-									}
-								}
-								else
-								{
-									t = cell[7] / (cell[7] - cell[6]);
-									point[0] = x + 1;
-									point[2] = z + 1;
-									point[1] = y + t;
-									newY[y, x + 1] = pointIndices[6] = StorePoint(grid, surface, point);
-								}
-								break;
-							case 7:
-								if (y != 0)
-								{
-									pointIndices[7] = oldLayer[x + 1];
-								}
-								else
-								{
-									if (cell[4] == 0)
-									{
-										oldLayer[x + 1] = pointIndices[7] = StorePoint(grid, surface, x + 1, 0, z);
-										if (SignBit(cell[0]) != 0)
-										{
-											pointIndices[8] = pointIndices[7];
-										}
-
-										if (SignBit(cell[5]) != 0)
-										{
-											pointIndices[4] = pointIndices[7];
-											if (z == 0)
-											{
-												oldY[0, x + 1] = pointIndices[4];
-											}
-										}
-									}
-									else if (cell[7] == 0)
-									{
-										oldLayer[x + 1] = pointIndices[7] = StorePoint(grid, surface, x + 1, 0, z + 1);
-										if (SignBit(cell[6]) != 0)
-										{
-											newY[0, x + 1] = pointIndices[6] = pointIndices[7];
-										}
-
-										if (SignBit(cell[3]) != 0)
-										{
-											newX[0, x] = pointIndices[11] = pointIndices[7];
-										}
-									}
-									else
-									{
-										t = cell[4] / (cell[4] - cell[7]);
-										point[0] = x + 1;
-										point[1] = 0;
-										point[2] = z + t;
-										oldLayer[x + 1] = pointIndices[7] = StorePoint(grid, surface, point);
-									}
-								}
-								break;
-							case 8:
-								if (z != 0 || y != 0)
-								{
-									pointIndices[8] = oldX[y, x];
-								}
-								else
-								{
-									if (cell[0] == 0)
-									{
-										pointIndices[8] = StorePoint(grid, surface, x, 0, 0);
-										if (SignBit(cell[1]) != 0)
-										{
-											pointIndices[0] = pointIndices[8];
-										}
-
-										if (SignBit(cell[3]) != 0)
-										{
-											pointIndices[3] = pointIndices[8];
-										}
-									}
-									else if (cell[4] == 0)
-									{
-										pointIndices[8] = StorePoint(grid, surface, x + 1, 0, 0);
-										if (SignBit(cell[5]) != 0)
-										{
-											oldY[0, x + 1] = pointIndices[4] = pointIndices[8];
-										}
-
-										if (SignBit(cell[7]) != 0)
-										{
-											oldLayer[x + 1] = pointIndices[7] = pointIndices[8];
-										}
-									}
-									else
-									{
-										t = cell[0] / (cell[0] - cell[4]);
-										point[1] = point[2] = 0;
-										point[0] = x + t;
-										pointIndices[8] = StorePoint(grid, surface, point);
-									}
-								}
-								break;
-							case 9:
-								if (z != 0)
-								{
-									pointIndices[9] = oldX[y + 1, x];
-								}
-								else
-								{
-									if (cell[1] == 0)
-									{
-										oldX[y + 1, x] = pointIndices[9] = StorePoint(grid, surface, x, y + 1, 0);
-										if (SignBit(cell[2]) != 0)
-										{
-											pointIndices[1] = pointIndices[9];
-											if (x == 0)
-											{
-												newLayer[0] = pointIndices[1];
-											}
-										}
-										if (SignBit(cell[0]) != 0)
-										{
-											pointIndices[0] = pointIndices[9];
-										}
-									}
-									else if (cell[5] == 0)
-									{
-										oldX[y + 1, x] = pointIndices[9] = StorePoint(grid, surface, x + 1, y + 1, 0);
-										if (SignBit(cell[6]) != 0)
-										{
-											newLayer[x + 1] = pointIndices[5] = pointIndices[9];
-										}
-
-										if (SignBit(cell[4]) != 0)
-										{
-											oldY[y, x + 1] = pointIndices[4] = pointIndices[9];
-										}
-									}
-									else
-									{
-										t = cell[1] / (cell[1] - cell[5]);
-										point[1] = y + 1;
-										point[2] = 0;
-										point[0] = x + t;
-										oldX[y + 1, x] = pointIndices[9] = StorePoint(grid, surface, point);
-									}
-								}
-								break;
-							case 10:
-								if (cell[2] == 0)
-								{
-									if (SignBit(cell[1]) != 0)
-									{
-										if (x != 0)
-										{
-											newX[y + 1, x] = pointIndices[10] = pointIndices[1] = newLayer[x];
-											if (SignBit(cell[3]) != 0)
-											{
-												pointIndices[2] = pointIndices[10];
-											}
-										}
-										else
-										{
-											newX[y + 1, 0] = pointIndices[10] = newLayer[0] = pointIndices[1] = StorePoint(grid, surface, 0, y + 1, z + 1);
-											if (SignBit(cell[3]) != 0)
-											{
-												newY[y, 0] = pointIndices[2] = pointIndices[10];
-											}
-										}
-									}
-									else if (SignBit(cell[3]) != 0)
-									{
-										if (x != 0)
-										{
-											newX[y + 1, x] = pointIndices[10] = pointIndices[2] = newY[y, x];
-										}
-										else
-										{
-											newX[y + 1, 0] = pointIndices[10] = newY[y, 0] = pointIndices[2] = StorePoint(grid, surface, 0, y + 1, z + 1);
-										}
-									}
-									else
-									{
-										newX[y + 1, x] = pointIndices[10] = StorePoint(grid, surface, x, y + 1, z + 1);
-									}
-								}
-								else if (cell[6] == 0)
-								{
-									newX[y + 1, x] = pointIndices[10] = StorePoint(grid, surface, x + 1, y + 1, z + 1);
-									if (SignBit(cell[5]) != 0)
-									{
-										newLayer[x + 1] = pointIndices[5] = pointIndices[10];
-									}
-
-									if (SignBit(cell[7]) != 0)
-									{
-										newY[y, x + 1] = pointIndices[6] = pointIndices[10];
-									}
-								}
-								else
-								{
-									t = cell[2] / (cell[2] - cell[6]);
-									point[1] = y + 1;
-									point[2] = z + 1;
-									point[0] = x + t;
-									newX[y + 1, x] = pointIndices[10] = StorePoint(grid, surface, point);
-								}
-								break;
-							case 11:
-								if (y != 0)
-								{
-									pointIndices[11] = newX[y, x];
-								}
-								else
-								{
-									if (cell[3] == 0)
-									{
-										newX[0, x] = pointIndices[11] = StorePoint(grid, surface, x, 0, z + 1);
-										if (SignBit(cell[0]) != 0)
-										{
-											pointIndices[3] = pointIndices[11];
-										}
-
-										if (SignBit(cell[2]) != 0)
-										{
-											pointIndices[2] = pointIndices[11];
-											if (x == 0)
-											{
-												newY[0, 0] = pointIndices[2];
-											}
-										}
-									}
-									else if (cell[7] == 0)
-									{
-										newX[0, x] = pointIndices[11] = StorePoint(grid, surface, x + 1, 0, z + 1);
-										if (SignBit(cell[4]) != 0)
-										{
-											oldLayer[x + 1] = pointIndices[7] = pointIndices[11];
-										}
-
-										if (SignBit(cell[6]) != 0)
-										{
-											newY[0, x + 1] = pointIndices[6] = pointIndices[11];
-										}
-									}
-									else
-									{
-										t = cell[3] / (cell[3] - cell[7]);
-										point[1] = 0;
-										point[2] = z + 1;
-										point[0] = x + t;
-										newX[0, x] = pointIndices[11] = StorePoint(grid, surface, point);
-									}
-								}
-								break;
-							case 12:
-								point[0] = x + 0.5f;
-								point[1] = y + 0.5f;
-								point[2] = z + 0.5f;
-								pointIndices[12] = StorePoint(grid, surface, point);
-								break;
-						}
-					}
-					triangle[vertexIndex] = pointIndices[caseCode];//now f contains the vertex indices of the triangle
+					triangle[vertexIndex] = GetPointIndex(grid, surface, caseCode, ref pointIndices, x, y, z, cell, oldLayer, newLayer, oldY, newY, oldX, newX);
 				}
 				if (triangle[0] != triangle[1] && triangle[0] != triangle[2] && triangle[1] != triangle[2])//to avoid zero area triangles
 				{
