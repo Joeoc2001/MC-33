@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MC_33
 {
-    internal class ListSurface : Surface
+    public class ListSurface : Surface
     {
         private readonly List<int> _triangles = new List<int>();
         private readonly List<Vector3> _vertices = new List<Vector3>();
