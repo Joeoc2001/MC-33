@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.Numerics;
 
 namespace MC_33
@@ -140,11 +139,6 @@ namespace MC_33
 				}
 			}
 			return 0;
-		}
-
-		static int StorePoint(Grid grid, Surface s, float[] r)
-		{
-			return StorePoint(grid, s, r[0], r[1], r[2]);
 		}
 
 		static int StorePoint(Grid grid, Surface s, float x, float y, float z)

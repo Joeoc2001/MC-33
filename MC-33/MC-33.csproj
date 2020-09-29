@@ -1,8 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard1.4</TargetFramework>
     <RootNamespace>MC_33</RootNamespace>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>0.1.0</Version>
+    <Authors>Joe O'Connor</Authors>
+    <Copyright />
+    <PackageProjectUrl>https://jenkins.joeoc.dev/job/MC-33/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Joeoc2001/MC-33.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageId>MC-33</PackageId>
+    <Product>MC-33</Product>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>

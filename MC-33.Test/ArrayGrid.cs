@@ -5,9 +5,9 @@ using System.Text;
 
 namespace MC_33
 {
-    public class ArrayGrid : Grid
+    internal class ArrayGrid : Grid
     {
-        private readonly float[,,] data;
+        private readonly float[,,] _data;
 
         /// <summary>
         /// Creates a new immutable grid of sampled points
@@ -19,25 +19,25 @@ namespace MC_33
         public ArrayGrid(float[,,] data, Vector3 r0, Vector3 d)
             : base(r0, d)
         {
-            this.data = data;
+            this._data = data;
         }
 
         public override float this[int x, int y, int z]
         {
-            get => data[x, y, z];
+            get => _data[x, y, z];
         }
 
         public override int SizeX
         {
-            get => data.GetLength(0) - 1;
+            get => _data.GetLength(0) - 1;
         }
         public override int SizeY
         {
-            get => data.GetLength(1) - 1;
+            get => _data.GetLength(1) - 1;
         }
         public override int SizeZ
         {
-            get => data.GetLength(2) - 1;
+            get => _data.GetLength(2) - 1;
         }
     }
 }

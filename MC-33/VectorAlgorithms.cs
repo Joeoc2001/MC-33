@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MC_33
 {
-    public static class VectorAlgorithms
+    internal static class VectorAlgorithms
     {
         /// <summary>
         /// Checks if two vectors are approximately equal, within some bound epsilon
