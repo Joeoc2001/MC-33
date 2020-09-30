@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.4</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <RootNamespace>MC_33</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <Authors>Joe O'Connor</Authors>
     <Copyright />
     <PackageProjectUrl>https://jenkins.joeoc.dev/job/MC-33/</PackageProjectUrl>
@@ -14,10 +14,5 @@
     <Product>MC-33</Product>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="System.Collections" Version="4.3.0" />
-    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
-  </ItemGroup>
 
 </Project>
