@@ -3,7 +3,7 @@ using System.Numerics;
 
 namespace MC_33
 {
-	internal static class MarchingCubes
+	public static class MarchingCubes
 	{
 		private static int ToInt(bool b) { return b ? 1 : 0; }
 
@@ -29,7 +29,7 @@ namespace MC_33
 		result value is 1 if the positive face vertices are joined, -1 if the negative
 		vertices are joined, and 0 (unchanged) if the test must no be applied. The
 		return value of this function is the the sum of all six results.*/
-		static int FaceTestAll(out int[] face, int ind, int sw, float[] v)
+		private static int FaceTestAll(out int[] face, int ind, int sw, float[] v)
 		{
 			face = new int[6];
 			if ((ind & 0x80) != 0)//vertex 0
@@ -61,7 +61,7 @@ namespace MC_33
 
 		/* Faster function for the face test, the test is applied to only one face
 		(int face). This function is only used for the cases 3 and 6 of MC33*/
-		static int FaceTestOne(int face, float[] v)
+		private static int FaceTestOne(int face, float[] v)
 		{
 			switch (face)
 			{
@@ -91,7 +91,7 @@ namespace MC_33
 		(case 13.5.2), returns 1 if one of the vertices 4, 5, 6 or 7 is joined to the
 		center point of the cube (case 13.5.2 too), and it returns 0 if the vertices
 		are no joined (case 13.5.1)*/
-		static int InteriorTest(int i, int flagtplane, float[] v)
+		private static int InteriorTest(int i, int flagtplane, float[] v)
 		{
 			//Signs of cube vertices were changed to use signbit function in calc_isosurface
 			//A0 = -v[0], B0 = -v[1], C0 = -v[2], D0 = -v[3]
@@ -141,7 +141,7 @@ namespace MC_33
 			return 0;
 		}
 
-		static int StorePoint(Grid grid, Surface s, float x, float y, float z)
+		private static int StorePoint(IGrid grid, ISurface s, float x, float y, float z)
 		{
 			Vector3 pos = new Vector3(x, y, z);
 			pos *= grid.Offset;
@@ -150,7 +150,7 @@ namespace MC_33
 			return s.AddVertex(pos);
 		}
 
-		static ushort[] GetCasePoints(int i, float[] cell, int mc33Case, int subCase, int lowestCaseBit, bool reverseTriangles)
+		private static ushort[] GetCasePoints(int i, float[] cell, int mc33Case, int subCase, int lowestCaseBit, bool reverseTriangles)
 		{
 			switch (mc33Case)//find the MC33 case
 			{
@@ -338,7 +338,7 @@ namespace MC_33
 			}
 		}
 
-		static int GetPointIndex(Grid grid, Surface surface, int caseCode, ref int[] pointIndices, int x, int y, int z, float[] cell,
+		private static int GetPointIndex(IGrid grid, ISurface surface, int caseCode, ref int[] pointIndices, int x, int y, int z, float[] cell,
 			int[] oldLayer, int[] newLayer, int[,] oldY, int[,] newY, int[,] oldX, int[,] newX)
 		{
 			float t;
@@ -919,7 +919,7 @@ namespace MC_33
 
 		*/
 
-		static void FindCase(Grid grid, Surface surface, int x, int y, int z, int i, float[] cell,
+		private static void FindCase(IGrid grid, ISurface surface, int x, int y, int z, int i, float[] cell,
 			int[] oldLayer, int[] newLayer, int[,] oldY, int[,] newY, int[,] oldX, int[,] newX)
 		{
 			int vertexIndex;
@@ -961,7 +961,7 @@ namespace MC_33
 			}
 		}
 
-		private static int GetLayerIntoVertices(ref float[] vertices, float iso, Grid grid, int x, int y, int z, int oldI)
+		private static int GetLayerIntoVertices(ref float[] vertices, float iso, IGrid grid, int x, int y, int z, int oldI)
 		{
 			vertices[0] = vertices[4];
 			vertices[1] = vertices[5];
@@ -976,7 +976,7 @@ namespace MC_33
 			return ((((((((oldI & 0x0F) << 1) | SignBit(vertices[4])) << 1) | SignBit(vertices[5])) << 1) | SignBit(vertices[6])) << 1) | SignBit(vertices[7]);
 		}
 
-		public static Surface CalculateSurface(Grid grid, float iso)
+		public static void MarchIntoSurface(IGrid grid, float iso, ISurface surface)
 		{
 			int nx = grid.SizeX;
 			int ny = grid.SizeY;
@@ -988,7 +988,6 @@ namespace MC_33
 			int[,] newY = new int[ny, nx + 1];
 			int[,] oldX = new int[ny + 1, nx];
 			int[,] newX = new int[ny + 1, nx];
-			Surface surface = new ListSurface();
 			for (int z = 0; z < nz; z++)
 			{
 				for (int y = 0; y < ny; y++)
@@ -1017,7 +1016,6 @@ namespace MC_33
 				oldY = newY;
 				newY = _tmp;
 			}
-			return surface;
 		}
 	}
 }

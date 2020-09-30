@@ -19,7 +19,7 @@ namespace MC_33_Tests.CaseSpecificTests
             };
 
             // ACT
-            List<Surface> expected = SpecificTests.GenAllTriangulations(new List<Vector3>() {
+            List<ListSurface> expected = SpecificTests.GenAllTriangulations(new List<Vector3>() {
                 new Vector3(0, 0, 0.5f),
                 new Vector3(1, 0, 0.5f),
                 new Vector3(1, 1, 0.5f),
@@ -41,7 +41,7 @@ namespace MC_33_Tests.CaseSpecificTests
             };
 
             // ACT
-            List<Surface> expected = SpecificTests.GenAllTriangulations(new List<Vector3>() {
+            List<ListSurface> expected = SpecificTests.GenAllTriangulations(new List<Vector3>() {
                 new Vector3(0, 1, 0.5f),
                 new Vector3(1, 1, 0.5f),
                 new Vector3(1, 0, 0.5f),

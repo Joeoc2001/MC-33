@@ -34,7 +34,8 @@ namespace MC_33_Tests.CaseSpecificTests
             ArrayGrid grid = GenerateSingle(valueSingle, valueOther, cellVertex);
 
             // ACT
-            Surface s = grid.GenerateSurface(iso);
+            ListSurface s = new ListSurface();
+            MarchingCubes.MarchIntoSurface(grid, iso, s);
             int[] triangles = s.GetTriangles();
             Vector3[] vertices = s.GetVertices();
 
@@ -85,15 +86,16 @@ namespace MC_33_Tests.CaseSpecificTests
         {
             // ARRANGE
             ArrayGrid grid = GenerateSingle(1, -1, 0);
-            Surface expected = new ListSurface();
+            ListSurface expected = new ListSurface();
             expected.AddVertex(new Vector3(0.5f, 0, 0));
             expected.AddVertex(new Vector3(0, 0.5f, 0));
             expected.AddVertex(new Vector3(0, 0, 0.5f));
             expected.AddTriangle(0, 1, 2);
 
             // ACT
-            Surface s = grid.GenerateSurface(0);
-            bool areEqual = Surface.AreSurfacesEquivalent(expected, s);
+            ListSurface s = new ListSurface();
+            MarchingCubes.MarchIntoSurface(grid, 0, s);
+            bool areEqual = ListSurface.AreSurfacesEquivalent(expected, s);
 
             // ASSERT
             Assert.IsTrue(areEqual);
@@ -104,15 +106,16 @@ namespace MC_33_Tests.CaseSpecificTests
         {
             // ARRANGE
             ArrayGrid grid = GenerateSingle(-1, 1, 0);
-            Surface expected = new ListSurface();
+            ListSurface expected = new ListSurface();
             expected.AddVertex(new Vector3(0.5f, 0, 0));
             expected.AddVertex(new Vector3(0, 0, 0.5f));
             expected.AddVertex(new Vector3(0, 0.5f, 0));
             expected.AddTriangle(0, 1, 2);
 
             // ACT
-            Surface s = grid.GenerateSurface(0);
-            bool areEqual = Surface.AreSurfacesEquivalent(expected, s);
+            ListSurface s = new ListSurface();
+            MarchingCubes.MarchIntoSurface(grid, 0, s);
+            bool areEqual = ListSurface.AreSurfacesEquivalent(expected, s);
 
             // ASSERT
             Assert.IsTrue(areEqual);
@@ -123,15 +126,16 @@ namespace MC_33_Tests.CaseSpecificTests
         {
             // ARRANGE
             ArrayGrid grid = GenerateSingle(-3, 1, 0);
-            Surface expected = new ListSurface();
+            ListSurface expected = new ListSurface();
             expected.AddVertex(new Vector3(0.75f, 0, 0));
             expected.AddVertex(new Vector3(0, 0, 0.75f));
             expected.AddVertex(new Vector3(0, 0.75f, 0));
             expected.AddTriangle(0, 1, 2);
 
             // ACT
-            Surface s = grid.GenerateSurface(0);
-            bool areEqual = Surface.AreSurfacesEquivalent(expected, s);
+            ListSurface s = new ListSurface();
+            MarchingCubes.MarchIntoSurface(grid, 0, s);
+            bool areEqual = ListSurface.AreSurfacesEquivalent(expected, s);
 
             // ASSERT
             Assert.IsTrue(areEqual);
@@ -142,15 +146,16 @@ namespace MC_33_Tests.CaseSpecificTests
         {
             // ARRANGE
             ArrayGrid grid = GenerateSingle(3, -1, 0);
-            Surface expected = new ListSurface();
+            ListSurface expected = new ListSurface();
             expected.AddVertex(new Vector3(0.75f, 0, 0));
             expected.AddVertex(new Vector3(0, 0.75f, 0));
             expected.AddVertex(new Vector3(0, 0, 0.75f));
             expected.AddTriangle(0, 1, 2);
 
             // ACT
-            Surface s = grid.GenerateSurface(0);
-            bool areEqual = Surface.AreSurfacesEquivalent(expected, s);
+            ListSurface s = new ListSurface();
+            MarchingCubes.MarchIntoSurface(grid, 0, s);
+            bool areEqual = ListSurface.AreSurfacesEquivalent(expected, s);
 
             // ASSERT
             Assert.IsTrue(areEqual);
@@ -161,15 +166,16 @@ namespace MC_33_Tests.CaseSpecificTests
         {
             // ARRANGE
             ArrayGrid grid = GenerateSingle(1, -3, 0);
-            Surface expected = new ListSurface();
+            ListSurface expected = new ListSurface();
             expected.AddVertex(new Vector3(0.25f, 0, 0));
             expected.AddVertex(new Vector3(0, 0.25f, 0));
             expected.AddVertex(new Vector3(0, 0, 0.25f));
             expected.AddTriangle(0, 1, 2);
 
             // ACT
-            Surface s = grid.GenerateSurface(0);
-            bool areEqual = Surface.AreSurfacesEquivalent(expected, s);
+            ListSurface s = new ListSurface();
+            MarchingCubes.MarchIntoSurface(grid, 0, s);
+            bool areEqual = ListSurface.AreSurfacesEquivalent(expected, s);
 
             // ASSERT
             Assert.IsTrue(areEqual);
@@ -180,15 +186,16 @@ namespace MC_33_Tests.CaseSpecificTests
         {
             // ARRANGE
             ArrayGrid grid = GenerateSingle(-1, 3, 0);
-            Surface expected = new ListSurface();
+            ListSurface expected = new ListSurface();
             expected.AddVertex(new Vector3(0.25f, 0, 0));
             expected.AddVertex(new Vector3(0, 0, 0.25f));
             expected.AddVertex(new Vector3(0, 0.25f, 0));
             expected.AddTriangle(0, 1, 2);
 
             // ACT
-            Surface s = grid.GenerateSurface(0);
-            bool areEqual = Surface.AreSurfacesEquivalent(expected, s);
+            ListSurface s = new ListSurface();
+            MarchingCubes.MarchIntoSurface(grid, 0, s);
+            bool areEqual = ListSurface.AreSurfacesEquivalent(expected, s);
 
             // ASSERT
             Assert.IsTrue(areEqual);

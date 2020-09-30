@@ -13,40 +13,29 @@ namespace MC_33
     /// d is the distance between adjacent points in each dimension
     /// (can be different for each dimension)
     /// </summary>
-    public abstract class Grid
+    public interface IGrid
     {
-        public Vector3 Origin { get; private set; }
-        public Vector3 Offset { get; private set; }
+        Vector3 Origin { get; }
+        Vector3 Offset { get; }
 
-        public Grid(Vector3 r0, Vector3 d)
-        {
-            Origin = r0;
-            Offset = d;
-        }
-
-        public abstract float this[int x, int y, int z]
+        float this[int x, int y, int z]
         {
             get;
         }
 
-        public abstract int SizeX
+        int SizeX
         {
             get;
         }
 
-        public abstract int SizeY
+        int SizeY
         {
             get;
         }
 
-        public abstract int SizeZ
+        int SizeZ
         {
             get;
-        }
-
-        public Surface GenerateSurface(float isovalue)
-        {
-            return MarchingCubes.CalculateSurface(this, isovalue);
         }
     }
 }

@@ -21,7 +21,8 @@ namespace MC_33_Tests
 
             // ACT
             ArrayGrid grid = new ArrayGrid(cells, Vector3.Zero, Vector3.One);
-            Surface s = grid.GenerateSurface(0);
+            ListSurface s = new ListSurface();
+            MarchingCubes.MarchIntoSurface(grid, 0, s);
             bool isClosed = s.IsClosed();
 
             // ASSERT

@@ -5,9 +5,12 @@ using System.Text;
 
 namespace MC_33
 {
-    internal class ArrayGrid : Grid
+    internal class ArrayGrid : IGrid
     {
         private readonly float[,,] _data;
+
+        public Vector3 Origin { get; private set; }
+        public Vector3 Offset { get; private set; }
 
         /// <summary>
         /// Creates a new immutable grid of sampled points
@@ -17,25 +20,26 @@ namespace MC_33
         /// <param name="r0">The coordinates of the first grid point</param>
         /// <param name="d">The distance between adjacent points in each dimension</param>
         public ArrayGrid(float[,,] data, Vector3 r0, Vector3 d)
-            : base(r0, d)
         {
             this._data = data;
+            Origin = r0;
+            Offset = d;
         }
 
-        public override float this[int x, int y, int z]
+        public float this[int x, int y, int z]
         {
             get => _data[x, y, z];
         }
 
-        public override int SizeX
+        public int SizeX
         {
             get => _data.GetLength(0) - 1;
         }
-        public override int SizeY
+        public int SizeY
         {
             get => _data.GetLength(1) - 1;
         }
-        public override int SizeZ
+        public int SizeZ
         {
             get => _data.GetLength(2) - 1;
         }

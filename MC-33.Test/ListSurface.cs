@@ -1,22 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Text;
 
 namespace MC_33
 {
-    public abstract class Surface
+    public class ListSurface : ISurface
     {
-        private static readonly double EPSILON = 0.000000001; // Used for comparing vectors in equality function
+        private static readonly double _epsilon = 0.000000001; // Used for comparing vectors in equality function
 
-        public abstract int AddVertex(Vector3 pos);
+        private readonly List<int> _triangles = new List<int>();
+        private readonly List<Vector3> _vertices = new List<Vector3>();
 
-        public abstract void AddTriangle(int p1, int p2, int p3);
+        public int AddVertex(Vector3 pos)
+        {
+            int c = _vertices.Count;
 
-        public abstract int[] GetTriangles();
+            _vertices.Add(pos);
 
-        public abstract Vector3[] GetVertices();
+            return c;
+        }
 
-        public abstract int GetVertexCount();
+        public void AddTriangle(int p1, int p2, int p3)
+        {
+            _triangles.Add(p1);
+            _triangles.Add(p2);
+            _triangles.Add(p3);
+        }
+
+        public int[] GetTriangles()
+        {
+            return _triangles.ToArray();
+        }
+
+        public Vector3[] GetVertices()
+        {
+            return _vertices.ToArray();
+        }
+
+        public int GetVertexCount()
+        {
+            return _vertices.Count;
+        }
 
         public int AddVertex(float x, float y, float z)
         {
@@ -38,7 +63,7 @@ namespace MC_33
                 for (int i = 0; i < 3; i++)
                 {
                     int j = (i + offset) % 3;
-                    diff |= !t1[i].EqualsApproximately(t2[j], EPSILON);
+                    diff |= !t1[i].EqualsApproximately(t2[j], _epsilon);
                 }
                 if (!diff)
                 {
@@ -48,7 +73,7 @@ namespace MC_33
             return false;
         }
 
-        public static bool AreSurfacesEquivalent(Surface surface1, Surface surface2)
+        public static bool AreSurfacesEquivalent(ListSurface surface1, ListSurface surface2)
         {
             int[] triangles1 = surface1.GetTriangles();
             int[] triangles2 = surface2.GetTriangles();
@@ -101,7 +126,7 @@ namespace MC_33
             return true;
         }
 
-        public bool IsEquivalentTo(Surface s)
+        public bool IsEquivalentTo(ListSurface s)
         {
             return AreSurfacesEquivalent(this, s);
         }
@@ -177,7 +202,8 @@ namespace MC_33
 
             foreach (List<int> edgeTriangles in trianglesByEdge.Values)
             {
-                if (edgeTriangles.Count != 2) {
+                if (edgeTriangles.Count != 2)
+                {
                     return false;
                 }
             }

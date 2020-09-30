@@ -18,9 +18,10 @@ namespace MC_33_Tests
             };
 
             ArrayGrid grid = new ArrayGrid(cells, Vector3.Zero, Vector3.One);
+            ListSurface s = new ListSurface();
 
             // ACT & ASSERT
-            Assert.DoesNotThrow(() => grid.GenerateSurface(0));
+            Assert.DoesNotThrow(() => MarchingCubes.MarchIntoSurface(grid, 0, s));
         }
 
         [Test]

@@ -7,22 +7,23 @@ namespace MC_33_Tests.CaseSpecificTests
 {
     static class SpecificTests
     {
-        public static bool TestSpecific(float[,,] cells, Surface expected)
+        public static bool TestSpecific(float[,,] cells, ListSurface expected)
         {
-            return TestSpecific(cells, new List<Surface>() { expected });
+            return TestSpecific(cells, new List<ListSurface>() { expected });
         }
 
         /// <summary>
         /// Tests a specific example of a cell. Assumes that delta in the grid is 1, origin is 0 and isovalue is 0
         /// </summary>
-        public static bool TestSpecific(float[,,] cells, IEnumerable<Surface> expecteds)
+        public static bool TestSpecific(float[,,] cells, IEnumerable<ListSurface> expecteds)
         {
             ArrayGrid grid = new ArrayGrid(cells, Vector3.Zero, Vector3.One);
-            Surface s = grid.GenerateSurface(0);
+            ListSurface s = new ListSurface();
+            MarchingCubes.MarchIntoSurface(grid, 0, s);
 
-            foreach (Surface e in expecteds)
+            foreach (ListSurface e in expecteds)
             {
-                if (Surface.AreSurfacesEquivalent(e, s))
+                if (ListSurface.AreSurfacesEquivalent(e, s))
                 {
                     return true;
                 }
@@ -30,7 +31,7 @@ namespace MC_33_Tests.CaseSpecificTests
             return false;
         }
 
-        private static void JoinInto(Surface into, Surface from)
+        private static void JoinInto(ListSurface into, ListSurface from)
         {
             int offset = into.GetVertexCount();
 
@@ -180,9 +181,9 @@ namespace MC_33_Tests.CaseSpecificTests
             return triangles;
         }
 
-        private static Surface GenSurfaceFromEdges(List<Vector3> vertices, List<Tuple<int, int>> edges)
+        private static ListSurface GenSurfaceFromEdges(List<Vector3> vertices, List<Tuple<int, int>> edges)
         {
-            Surface surface = new ListSurface();
+            ListSurface surface = new ListSurface();
 
             foreach (Vector3 vertex in vertices)
             {
@@ -198,11 +199,11 @@ namespace MC_33_Tests.CaseSpecificTests
             return surface;
         }
 
-        public static List<Surface> GenAllTriangulations(List<Vector3> polygon)
+        public static List<ListSurface> GenAllTriangulations(List<Vector3> polygon)
         {
             List<List<Tuple<int, int>>> perms = GenAllTriangulationPatterns(polygon.Count);
 
-            List<Surface> surfaces = new List<Surface>();
+            List<ListSurface> surfaces = new List<ListSurface>();
             foreach (List<Tuple<int, int>> edgeSet in perms)
             {
                 surfaces.Add(GenSurfaceFromEdges(polygon, edgeSet));
@@ -211,17 +212,17 @@ namespace MC_33_Tests.CaseSpecificTests
             return surfaces;
         }
 
-        public static List<Surface> AddAllTriangulations(IEnumerable<Surface> surfaces, List<Vector3> polygon)
+        public static List<ListSurface> AddAllTriangulations(IEnumerable<ListSurface> surfaces, List<Vector3> polygon)
         {
-            List<Surface> triangulations = GenAllTriangulations(polygon);
+            List<ListSurface> triangulations = GenAllTriangulations(polygon);
 
-            List<Surface> newSurfaces = new List<Surface>();
-            foreach (Surface oldSurface in surfaces)
+            List<ListSurface> newSurfaces = new List<ListSurface>();
+            foreach (ListSurface oldSurface in surfaces)
             {
                 int offset = oldSurface.GetVertexCount();
-                foreach (Surface triangulation in triangulations)
+                foreach (ListSurface triangulation in triangulations)
                 {
-                    Surface newSurface = new ListSurface();
+                    ListSurface newSurface = new ListSurface();
                     JoinInto(newSurface, oldSurface);
                     JoinInto(newSurface, triangulation);
                     newSurfaces.Add(newSurface);

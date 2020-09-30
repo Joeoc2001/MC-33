@@ -29,7 +29,8 @@ namespace MC_33_Tests.CaseSpecificTests
             ArrayGrid grid = GenerateUniform(value, width);
 
             // ACT
-            Surface s = grid.GenerateSurface(iso);
+            ListSurface s = new ListSurface();
+            MarchingCubes.MarchIntoSurface(grid, iso, s);
             int[] triangles = s.GetTriangles();
             Vector3[] vertices = s.GetVertices();
 
